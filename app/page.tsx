@@ -31,6 +31,13 @@ export default function Home() {
       setTitle(currentNote.title);
       setContent(currentNote.content);
       setHasChanges(false);
+      
+      // Se é uma nota nova (sem título e conteúdo), forçar modo de edição
+      const isNewNote = !currentNote.title && !currentNote.content;
+      if (isNewNote) {
+        setIsPreviewMode(false);
+      }
+      
       // Garantir que updatedAt seja uma data válida
       const updatedAtDate = currentNote.updatedAt instanceof Date 
         ? currentNote.updatedAt 
