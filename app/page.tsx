@@ -200,7 +200,7 @@ export default function Home() {
               placeholder="Escreva sua nota em Markdown..."
               value={content}
               onChange={(e) => handleContentChange(e.target.value)}
-              className="h-full w-full border-none resize-none focus-visible:ring-0 px-8 py-0 font-mono text-sm leading-relaxed bg-transparent overflow-hidden"
+              className="h-full w-full border-none resize-none focus-visible:ring-0 px-8 py-0 font-mono text-sm leading-relaxed bg-transparent notion-scrollbar"
             />
           )}
         </div>
@@ -339,7 +339,7 @@ export default function Home() {
                 placeholder="Escreva sua nota em Markdown..."
                 value={content}
                 onChange={(e) => handleContentChange(e.target.value)}
-                className="h-full w-full border-none resize-none focus-visible:ring-0 px-12 py-0 font-mono text-sm leading-relaxed bg-transparent overflow-hidden"
+                className="h-full w-full border-none resize-none focus-visible:ring-0 px-12 py-0 font-mono text-sm leading-relaxed bg-transparent notion-scrollbar"
               />
             )}
           </div>
