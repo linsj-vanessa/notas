@@ -5,6 +5,27 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.4] - 2025-01-08
+
+### 🎨 Scrollbar Estilo Notion
+- **Sempre Visível**: Scrollbar agora fica sempre visível, não desaparece
+- **Ultra Fino**: Reduzido para 3px, ainda mais discreto que antes
+- **Inspirado no Notion**: Design baseado na interface do Notion
+- **Consistência Global**: Aplicado em toda a aplicação (editor, preview, sidebar)
+- **Sem Hover**: Remove dependência de hover para mostrar o scroll
+
+### 🔧 Melhorado
+- **Nova Classe CSS**: `.notion-scrollbar` substitui classes anteriores
+- **Visibilidade Constante**: Scroll sempre presente para melhor UX
+- **Design Minimalista**: Cor sutil que não interfere no conteúdo
+- **Responsividade**: Funciona em todos os modos e componentes
+
+### 📦 Técnico
+- Nova classe `.notion-scrollbar` no `globals.css`
+- Aplicada em `page.tsx` e `AppLayout.tsx`
+- Scrollbar de 3px com transparência otimizada
+- Removida lógica de hover para simplificar
+
 ## [1.7.3] - 2025-01-08
 
 ### 🎨 Reposicionamento de Scroll
