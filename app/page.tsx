@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { useNotesStore } from '@/lib/store';
 import { Textarea } from '@/components/ui/textarea';
@@ -25,6 +25,11 @@ export default function Home() {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  
+  // Ref para o textarea principal
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // Ref para o textarea do modo foco
+  const focusTextareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (currentNote) {
@@ -32,10 +37,18 @@ export default function Home() {
       setContent(currentNote.content);
       setHasChanges(false);
       
-      // Se é uma nota nova (sem título e conteúdo), forçar modo de edição
+      // Se é uma nota nova (sem título e conteúdo), forçar modo de edição e focar no textarea
       const isNewNote = !currentNote.title && !currentNote.content;
       if (isNewNote) {
         setIsPreviewMode(false);
+        
+        // Focar no textarea após um pequeno delay para garantir que o componente foi renderizado
+        setTimeout(() => {
+          const activeTextarea = isFocusMode ? focusTextareaRef.current : textareaRef.current;
+          if (activeTextarea) {
+            activeTextarea.focus();
+          }
+        }, 100);
       }
       
       // Garantir que updatedAt seja uma data válida
@@ -44,7 +57,7 @@ export default function Home() {
         : new Date(currentNote.updatedAt);
       setLastSaved(isNaN(updatedAtDate.getTime()) ? new Date() : updatedAtDate);
     }
-  }, [currentNote]);
+  }, [currentNote, isFocusMode]);
 
   const handleSave = async () => {
     if (currentNote && hasChanges) {
@@ -208,6 +221,7 @@ export default function Home() {
               value={content}
               onChange={(e) => handleContentChange(e.target.value)}
               className="h-full w-full border-none resize-none focus-visible:ring-0 px-8 py-0 font-mono text-sm leading-relaxed bg-transparent notion-scrollbar"
+              ref={textareaRef}
             />
           )}
         </div>
@@ -347,6 +361,7 @@ export default function Home() {
                 value={content}
                 onChange={(e) => handleContentChange(e.target.value)}
                 className="h-full w-full border-none resize-none focus-visible:ring-0 px-12 py-0 font-mono text-sm leading-relaxed bg-transparent notion-scrollbar"
+                ref={focusTextareaRef}
               />
             )}
           </div>

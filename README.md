@@ -10,6 +10,7 @@ Editor de notas em Markdown com armazenamento local usando IndexedDB. Todas as s
 
 ### 📝 **Gestão de Notas**
 - ✅ Criar notas com título e conteúdo
+- ✅ **Foco Automático**: Cursor vai automaticamente para o campo de texto ao criar nova nota
 - ✅ Editar notas em tempo real
 - ✅ Salvar automático (2 segundos de inatividade)
 - ✅ Deletar notas (com confirmação)
@@ -57,6 +58,8 @@ Editor de notas em Markdown com armazenamento local usando IndexedDB. Todas as s
 ### 1. **Criar uma Nova Nota**
 - Clique no botão "Nova Nota" no cabeçalho
 - A nota será criada automaticamente e aberta para edição
+- **Foco Automático**: O cursor vai direto para o campo de texto - você pode começar a digitar imediatamente
+- Funciona tanto no modo normal quanto no modo foco
 
 ### 2. **Editar Notas**
 - Clique em qualquer nota na sidebar para abri-la

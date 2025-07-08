@@ -5,6 +5,45 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.6] - 2025-01-08
+
+### ✨ Foco Automático em Novas Notas
+- **Captura Rápida**: Ao criar uma nova nota, o cursor vai automaticamente para o textarea
+- **UX Otimizada**: Elimina a necessidade de clicar no campo de texto para começar a escrever
+- **Timeout Inteligente**: Delay de 100ms garante que o componente seja renderizado antes do foco
+- **Modo Foco Suportado**: Funciona tanto no modo normal quanto no modo foco
+- **Refs Dedicadas**: Gerenciamento separado para textarea normal e modo foco
+
+### 🔧 Melhorado
+- **Produtividade**: Reduz fricção na captura de ideias e pensamentos
+- **Fluxo Natural**: Transição direta de "Nova Nota" para escrita
+- **Detecção Inteligente**: Usa detecção de nota vazia existente como trigger
+- **Consistência**: Implementação funciona em todos os cenários de uso
+
+### 📦 Técnico
+- Adicionadas refs `textareaRef` e `focusTextareaRef`
+- Lógica de foco integrada ao `useEffect` existente
+- Dependência `isFocusMode` adicionada ao `useEffect`
+- Timeout de 100ms para garantir renderização do DOM
+
+## [1.7.5] - 2025-01-08
+
+### ✨ Melhoria de UX - Auto-Edição
+- **Novas Notas em Edição**: Ao clicar em "Nova Nota", ela abre automaticamente no modo de edição
+- **Detecção Inteligente**: Sistema detecta notas vazias (sem título e conteúdo) e força modo de edição
+- **UX Otimizada**: Usuário pode começar a escrever imediatamente sem clicar em "Editar"
+- **Comportamento Consistente**: Funciona tanto no modo normal quanto no modo foco
+
+### 🔧 Melhorado
+- **Scroll no Textarea**: Corrigido scroll que havia desaparecido no modo de edição
+- **Fluxo de Criação**: Criação de notas mais fluida e intuitiva
+- **Produtividade**: Menos cliques para começar a escrever uma nova nota
+
+### 📦 Técnico
+- Lógica adicionada no `useEffect` para detectar notas novas
+- Aplicação automática do `setIsPreviewMode(false)` para notas vazias
+- Scrollbar estilo Notion aplicado no Textarea
+
 ## [1.7.4] - 2025-01-08
 
 ### 🎨 Scrollbar Estilo Notion
