@@ -5,6 +5,27 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.3] - 2025-01-08
+
+### 🎨 Reposicionamento de Scroll
+- **Scroll no Canto Esquerdo**: Scrollbar agora fica o mais próximo possível da borda esquerda
+- **Espaçamento Lateral Mantido**: Conteúdo das notas mantém espaçamento apenas nas laterais
+- **Nova Classe CSS**: Criada `left-edge-scrollbar` com scrollbar de 4px para melhor posicionamento
+- **Estrutura Reorganizada**: Container de scroll ocupa toda largura, padding aplicado apenas no conteúdo
+- **Ambos os Modos**: Implementação consistente no modo normal e modo foco
+
+### 🔧 Melhorado
+- **Scrollbar Mais Fino**: Reduzido de 6px para 4px para ser menos intrusivo
+- **Posicionamento Preciso**: Scroll posicionado no extremo esquerdo da área de conteúdo
+- **Transições Suaves**: Mantidas animações de 0.3s para hover
+- **Responsividade**: Ajustes aplicados tanto no modo normal quanto foco
+
+### 📦 Técnico
+- Nova classe `.left-edge-scrollbar` no `globals.css`
+- Reestruturação de containers em `page.tsx`
+- Padding lateral movido para elementos internos
+- Scrollbar otimizado para webkit browsers
+
 ## [1.7.2] - 2025-01-08
 
 ### 🎨 Ajustes Estéticos
