@@ -176,4 +176,32 @@
   .left-edge-scrollbar::-webkit-scrollbar-corner {
     background: transparent;
   }
+
+  /* Scrollbar estilo Notion - sempre visível e fino */
+  .notion-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent;
+  }
+
+  .notion-scrollbar::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+
+  .notion-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .notion-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.2);
+    border-radius: 1.5px;
+  }
+
+  .notion-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.35);
+  }
+
+  .notion-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+  }
 }

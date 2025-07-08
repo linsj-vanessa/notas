@@ -143,7 +143,7 @@ export default function Home() {
 
       {/* Editor/Preview Area - Scroll no canto esquerdo */}
       <div className="flex-1 overflow-hidden py-6 flex items-start justify-center">
-        <div className="w-full max-w-4xl h-full overflow-y-auto left-edge-scrollbar">
+        <div className="w-full max-w-4xl h-full overflow-y-auto notion-scrollbar">
           {isPreviewMode ? (
             <div className="px-8">
               <div className="prose prose-slate max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted">
@@ -282,7 +282,7 @@ export default function Home() {
 
         {/* Área principal centralizada */}
         <div className="flex-1 overflow-hidden py-8 flex items-start justify-center">
-          <div className="w-full max-w-5xl h-full overflow-y-auto left-edge-scrollbar">
+          <div className="w-full max-w-5xl h-full overflow-y-auto notion-scrollbar">
             {isPreviewMode ? (
               <div className="px-12">
                 <div className="prose prose-slate max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted">
