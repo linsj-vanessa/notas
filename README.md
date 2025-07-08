@@ -10,7 +10,7 @@ Editor de notas em Markdown com armazenamento local usando IndexedDB. Todas as s
 
 ### 📝 **Gestão de Notas**
 - ✅ Criar notas com título e conteúdo
-- ✅ **Foco Automático**: Cursor vai automaticamente para o campo de texto ao criar nova nota
+- ✅ **Foco Automático**: Cursor vai AUTOMATICAMENTE para o campo de texto ao criar nova nota - zero cliques extras!
 - ✅ Editar notas em tempo real
 - ✅ Salvar automático (2 segundos de inatividade)
 - ✅ Deletar notas (com confirmação)

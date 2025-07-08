@@ -42,13 +42,13 @@ export default function Home() {
       if (isNewNote) {
         setIsPreviewMode(false);
         
-        // Focar no textarea após um pequeno delay para garantir que o componente foi renderizado
+        // Focar no textarea após um delay para garantir que o componente foi renderizado
         setTimeout(() => {
           const activeTextarea = isFocusMode ? focusTextareaRef.current : textareaRef.current;
           if (activeTextarea) {
             activeTextarea.focus();
           }
-        }, 100);
+        }, 200);
       }
       
       // Garantir que updatedAt seja uma data válida
@@ -62,7 +62,10 @@ export default function Home() {
   const handleSave = async () => {
     if (currentNote && hasChanges) {
       try {
-        await updateNote(currentNote.id, { title, content });
+        // Se não tem título, criar um título padrão baseado na data
+        const finalTitle = title.trim() || `Nota ${new Date().toLocaleString('pt-BR')}`;
+        await updateNote(currentNote.id, { title: finalTitle, content });
+        setTitle(finalTitle); // Atualizar o estado local também
         setHasChanges(false);
         setLastSaved(new Date());
       } catch (error) {

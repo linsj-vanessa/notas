@@ -45,8 +45,8 @@ export const useNotesStore = create<NotesState>()(
         const now = new Date();
         const note: Note = {
           id: crypto.randomUUID(),
-          title: data.title || `Nota ${new Date().toLocaleString('pt-BR')}`,
-          content: data.content,
+          title: data.title || '',
+          content: data.content || '',
           createdAt: now,
           updatedAt: now,
           tags: data.tags || [],

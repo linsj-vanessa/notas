@@ -7,24 +7,29 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [1.7.6] - 2025-01-08
 
-### ✨ Foco Automático em Novas Notas
-- **Captura Rápida**: Ao criar uma nova nota, o cursor vai automaticamente para o textarea
-- **UX Otimizada**: Elimina a necessidade de clicar no campo de texto para começar a escrever
-- **Timeout Inteligente**: Delay de 100ms garante que o componente seja renderizado antes do foco
-- **Modo Foco Suportado**: Funciona tanto no modo normal quanto no modo foco
-- **Refs Dedicadas**: Gerenciamento separado para textarea normal e modo foco
+### ✨ Foco Automático em Novas Notas - CORRIGIDO
+- **Captura Instantânea**: Ao criar uma nova nota, o cursor vai automaticamente para o textarea
+- **Zero Cliques Extra**: Elimina completamente a necessidade de clicar no campo de texto
+- **Notas Realmente Vazias**: Notas criadas sem título padrão para funcionamento correto
+- **ForwardRef Corrigido**: Componente Textarea agora suporta refs corretamente
+- **Título Automático**: Título padrão aplicado apenas no momento do salvamento
 
 ### 🔧 Melhorado
-- **Produtividade**: Reduz fricção na captura de ideias e pensamentos
-- **Fluxo Natural**: Transição direta de "Nova Nota" para escrita
-- **Detecção Inteligente**: Usa detecção de nota vazia existente como trigger
-- **Consistência**: Implementação funciona em todos os cenários de uso
+- **Timeout Aumentado**: Delay de 200ms para garantir renderização completa
+- **Detecção Precisa**: Notas vazias detectadas corretamente sem título padrão
+- **Salvamento Inteligente**: Títulos padrão aplicados apenas quando necessário
+- **UX Perfeita**: Fluxo direto de criação para escrita sem interrupções
+
+### 🐛 Corrigido
+- **ForwardRef**: Componente `Textarea` agora usa `React.forwardRef` corretamente
+- **Refs Funcionais**: Referencias para textareas funcionando em todos os modos
+- **Criação Limpa**: Notas criadas com `title: ''` em vez de título padrão automático
 
 ### 📦 Técnico
-- Adicionadas refs `textareaRef` e `focusTextareaRef`
-- Lógica de foco integrada ao `useEffect` existente
-- Dependência `isFocusMode` adicionada ao `useEffect`
-- Timeout de 100ms para garantir renderização do DOM
+- Componente `Textarea` refatorado com `forwardRef` e `displayName`
+- Store alterado para criar notas realmente vazias
+- Lógica de título padrão movida para `handleSave`
+- Timeout aumentado para 200ms para maior compatibilidade
 
 ## [1.7.5] - 2025-01-08
 
