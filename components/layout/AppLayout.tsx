@@ -90,7 +90,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-80 border-r border-border bg-background overflow-y-auto">
+        <aside className="w-80 border-r border-border bg-background overflow-y-auto subtle-scrollbar">
           <div className="p-4">
             <div className="space-y-2">
               <h2 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">

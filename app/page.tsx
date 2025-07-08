@@ -95,7 +95,7 @@ export default function Home() {
   }, [hasChanges, title, content]);
 
   const editorContent = (
-    <div className="h-full flex flex-col bg-muted/20">
+    <div className="h-full flex flex-col">
       {/* Editor Header - Mantém fixo no topo */}
       <div className="border-b border-border bg-background p-4 flex items-center justify-between">
         <div className="flex-1">
@@ -141,11 +141,11 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Editor/Preview Area - Com caixinha centralizada */}
-      <div className="flex-1 overflow-hidden p-6 flex items-start justify-center">
-        <div className="w-full max-w-4xl h-full bg-background rounded-lg border border-border shadow-sm overflow-hidden">
+      {/* Editor/Preview Area - Scroll no canto esquerdo */}
+      <div className="flex-1 overflow-hidden py-6 flex items-start justify-center">
+        <div className="w-full max-w-4xl h-full overflow-y-auto left-edge-scrollbar">
           {isPreviewMode ? (
-            <div className="h-full overflow-y-auto p-8">
+            <div className="px-8">
               <div className="prose prose-slate max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted">
                 <ReactMarkdown 
                   remarkPlugins={[remarkGfm]}
@@ -200,7 +200,7 @@ export default function Home() {
               placeholder="Escreva sua nota em Markdown..."
               value={content}
               onChange={(e) => handleContentChange(e.target.value)}
-              className="h-full w-full border-none resize-none focus-visible:ring-0 p-8 font-mono text-sm leading-relaxed bg-transparent rounded-lg"
+              className="h-full w-full border-none resize-none focus-visible:ring-0 px-8 py-0 font-mono text-sm leading-relaxed bg-transparent overflow-hidden"
             />
           )}
         </div>
@@ -218,8 +218,8 @@ export default function Home() {
   if (!currentNote) {
     return (
       <AppLayout>
-        <div className="h-full bg-muted/20 p-6 flex items-center justify-center">
-          <div className="max-w-md bg-background rounded-lg border border-border shadow-sm p-8">
+        <div className="h-full p-6 flex items-center justify-center">
+          <div className="max-w-md p-8">
             <div className="text-center space-y-4">
               <h2 className="text-2xl font-semibold text-foreground">
                 Bem-vindo ao Notas App
@@ -243,7 +243,7 @@ export default function Home() {
   // Se estiver em modo foco, renderiza apenas o editor sem o AppLayout
   if (isFocusMode) {
     return (
-      <div className="h-screen bg-muted/20 flex flex-col">
+      <div className="h-screen flex flex-col">
         {/* Header simplificado para modo foco */}
         <div className="border-b border-border bg-background p-4 flex items-center justify-between">
           <div className="flex-1">
@@ -281,10 +281,10 @@ export default function Home() {
         </div>
 
         {/* Área principal centralizada */}
-        <div className="flex-1 overflow-hidden p-8 flex items-start justify-center">
-          <div className="w-full max-w-5xl h-full bg-background rounded-lg border border-border shadow-sm overflow-hidden">
+        <div className="flex-1 overflow-hidden py-8 flex items-start justify-center">
+          <div className="w-full max-w-5xl h-full overflow-y-auto left-edge-scrollbar">
             {isPreviewMode ? (
-              <div className="h-full overflow-y-auto p-8">
+              <div className="px-12">
                 <div className="prose prose-slate max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted">
                   <ReactMarkdown 
                     remarkPlugins={[remarkGfm]}
@@ -339,7 +339,7 @@ export default function Home() {
                 placeholder="Escreva sua nota em Markdown..."
                 value={content}
                 onChange={(e) => handleContentChange(e.target.value)}
-                className="h-full w-full border-none resize-none focus-visible:ring-0 p-8 font-mono text-sm leading-relaxed bg-transparent rounded-lg"
+                className="h-full w-full border-none resize-none focus-visible:ring-0 px-12 py-0 font-mono text-sm leading-relaxed bg-transparent overflow-hidden"
               />
             )}
           </div>

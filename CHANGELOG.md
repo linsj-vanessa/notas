@@ -5,6 +5,26 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.2] - 2025-01-08
+
+### 🎨 Ajustes Estéticos
+- **Interface Limpa**: Removida caixinha visual (bordas, sombras, background)
+- **Centralização Simples**: Mantida centralização apenas com espaçamento elegante
+- **Background Neutro**: Removido fundo colorido para interface mais clean
+- **Foco no Conteúdo**: Editor agora é completamente integrado ao layout
+- **Scrollbar Sutil**: Scrollbar customizado que aparece apenas no hover
+- **Consistência**: Ajustes aplicados em todos os modos (normal, foco, preview)
+
+### 🔧 Melhorado
+- **Experiência Visual**: Interface mais minimalista e moderna
+- **Scrollbar Customizado**: Scrollbar de 6px que aparece só no hover
+- **Posicionamento**: Scrollbar posicionado no canto superior direito
+- **Transparência**: Scrollbar quase invisível até fazer hover
+- **Suavidade**: Transições suaves de 0.3s para aparecer/desaparecer
+- **Padding Otimizado**: Espaçamento interno mantido para boa legibilidade
+- **Responsividade**: Mantida largura máxima inteligente
+- **Performance**: Layout mais leve sem elementos decorativos
+
 ## [1.7.1] - 2025-01-08
 
 ### 🐛 Corrigido

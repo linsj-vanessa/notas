@@ -71,3 +71,109 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Scrollbar customizado - mais sutil */
+@layer utilities {
+  /* Para Webkit browsers (Chrome, Safari, Edge) */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.2);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.3);
+    background-clip: content-box;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Scrollbar apenas no hover para ser mais sutil */
+  .subtle-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.3s ease;
+  }
+
+  .subtle-scrollbar:hover {
+    scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+  }
+
+  .subtle-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .subtle-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .subtle-scrollbar::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 3px;
+    transition: background 0.3s ease;
+  }
+
+  .subtle-scrollbar:hover::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.2);
+  }
+
+  .subtle-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.3);
+  }
+
+  /* Scrollbar no canto esquerdo - mais próximo da borda */
+  .left-edge-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.3s ease;
+  }
+
+  .left-edge-scrollbar:hover {
+    scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+  }
+
+  .left-edge-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  .left-edge-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .left-edge-scrollbar::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 2px;
+    transition: background 0.3s ease;
+  }
+
+  .left-edge-scrollbar:hover::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.3);
+  }
+
+  .left-edge-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.4);
+  }
+
+  .left-edge-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
