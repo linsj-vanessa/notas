@@ -3,13 +3,12 @@
 import { useEffect, useState, useRef } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { useNotesStore } from '@/lib/store';
-import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Save, Eye, Edit, Trash2, Maximize2, Minimize2 } from 'lucide-react';
 import StatusBar from '@/components/ui/status-bar';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import TipTapEditor, { TipTapEditorRef } from '@/components/ui/tiptap-editor';
+import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 
 export default function Home() {
   const { 
@@ -22,14 +21,17 @@ export default function Home() {
   } = useNotesStore();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [isPreviewMode, setIsPreviewMode] = useState(false);
+
   const [hasChanges, setHasChanges] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   
-  // Ref para o textarea principal
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  // Ref para o textarea do modo foco
-  const focusTextareaRef = useRef<HTMLTextAreaElement>(null);
+  // Estado para controlar o modal de confirmação
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  
+  // Ref para o editor TipTap principal
+  const editorRef = useRef<TipTapEditorRef>(null);
+  // Ref para o editor TipTap do modo foco
+  const focusEditorRef = useRef<TipTapEditorRef>(null);
 
   useEffect(() => {
     if (currentNote) {
@@ -37,19 +39,17 @@ export default function Home() {
       setContent(currentNote.content);
       setHasChanges(false);
       
-      // Se é uma nota nova (sem título e conteúdo), forçar modo de edição e focar no textarea
-      const isNewNote = !currentNote.title && !currentNote.content;
-      if (isNewNote) {
-        setIsPreviewMode(false);
-        
-        // Focar no textarea após um delay para garantir que o componente foi renderizado
-        setTimeout(() => {
-          const activeTextarea = isFocusMode ? focusTextareaRef.current : textareaRef.current;
-          if (activeTextarea) {
-            activeTextarea.focus();
-          }
-        }, 200);
-      }
+              // Se é uma nota nova (sem título e conteúdo), focar no editor
+        const isNewNote = !currentNote.title && !currentNote.content;
+        if (isNewNote) {
+          // Focar no editor após um delay para garantir que o componente foi renderizado
+          setTimeout(() => {
+            const activeEditor = isFocusMode ? focusEditorRef.current : editorRef.current;
+            if (activeEditor) {
+              activeEditor.focus();
+            }
+          }, 200);
+        }
       
       // Garantir que updatedAt seja uma data válida
       const updatedAtDate = currentNote.updatedAt instanceof Date 
@@ -74,22 +74,22 @@ export default function Home() {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
+    if (!currentNote) return;
+    setShowDeleteModal(true);
+  };
+
+  // Função para confirmar a exclusão
+  const confirmDelete = async () => {
     if (!currentNote) return;
     
-    const confirmed = confirm(
-      `Tem certeza que deseja apagar a nota "${currentNote.title || 'Nota sem título'}"?\n\nEsta ação não pode ser desfeita.`
-    );
-    
-    if (confirmed) {
-      try {
-        await deleteNote(currentNote.id);
-        setCurrentNote(null); // Remove a nota atual da visualização
-        setFocusMode(false); // Sai do modo foco se a nota for deletada
-      } catch (error) {
-        console.error('Error deleting note:', error);
-        alert('Erro ao apagar a nota. Tente novamente.');
-      }
+    try {
+      await deleteNote(currentNote.id);
+      setCurrentNote(null); // Remove a nota atual da visualização
+      setFocusMode(false); // Sai do modo foco se a nota for deletada
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      alert('Erro ao apagar a nota. Tente novamente.');
     }
   };
 
@@ -107,6 +107,8 @@ export default function Home() {
     setFocusMode(!isFocusMode);
   };
 
+
+
   // Auto-save after 2 seconds of inactivity
   useEffect(() => {
     if (hasChanges) {
@@ -116,6 +118,8 @@ export default function Home() {
       return () => clearTimeout(timer);
     }
   }, [hasChanges, title, content]);
+
+
 
   const editorContent = (
     <div className="h-full flex flex-col">
@@ -140,14 +144,7 @@ export default function Home() {
             {isFocusMode ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
             {isFocusMode ? 'Sair do Foco' : 'Foco'}
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsPreviewMode(!isPreviewMode)}
-          >
-            {isPreviewMode ? <Edit className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-            {isPreviewMode ? 'Editar' : 'Visualizar'}
-          </Button>
+
           <Button size="sm" onClick={handleSave} disabled={!hasChanges}>
             <Save className="h-4 w-4 mr-2" />
             Salvar
@@ -164,69 +161,19 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Editor/Preview Area - Scroll no canto esquerdo */}
-      <div className="flex-1 overflow-hidden py-6 flex items-start justify-center">
-        <div className="w-full max-w-4xl h-full overflow-y-auto notion-scrollbar">
-          {isPreviewMode ? (
-            <div className="px-8">
-              <div className="prose prose-slate max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted">
-                <ReactMarkdown 
-                  remarkPlugins={[remarkGfm]}
-                  components={{
-                    h1: ({children}) => <h1 className="text-3xl font-bold mb-4 text-foreground">{children}</h1>,
-                    h2: ({children}) => <h2 className="text-2xl font-semibold mb-3 text-foreground">{children}</h2>,
-                    h3: ({children}) => <h3 className="text-xl font-medium mb-2 text-foreground">{children}</h3>,
-                    p: ({children}) => <p className="mb-4 text-foreground leading-relaxed">{children}</p>,
-                    ul: ({children}) => <ul className="list-disc list-inside mb-4 space-y-1">{children}</ul>,
-                    ol: ({children}) => <ol className="list-decimal list-inside mb-4 space-y-1">{children}</ol>,
-                    li: ({children}) => <li className="text-foreground">{children}</li>,
-                    code: ({children, className}) => {
-                      const match = /language-(\w+)/.exec(className || '');
-                      return match ? (
-                        <pre className="bg-muted p-4 rounded-lg overflow-x-auto mb-4">
-                          <code className="text-sm font-mono text-foreground">{children}</code>
-                        </pre>
-                      ) : (
-                        <code className="bg-muted px-1 py-0.5 rounded text-sm font-mono text-foreground">{children}</code>
-                      );
-                    },
-                    blockquote: ({children}) => (
-                      <blockquote className="border-l-4 border-primary pl-4 italic mb-4 text-muted-foreground">
-                        {children}
-                      </blockquote>
-                    ),
-                    hr: () => <hr className="my-6 border-border" />,
-                    a: ({children, href}) => (
-                      <a href={href} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
-                        {children}
-                      </a>
-                    ),
-                    table: ({children}) => (
-                      <div className="overflow-x-auto mb-4">
-                        <table className="min-w-full border border-border">{children}</table>
-                      </div>
-                    ),
-                    th: ({children}) => (
-                      <th className="border border-border bg-muted p-2 text-left font-semibold">{children}</th>
-                    ),
-                    td: ({children}) => (
-                      <td className="border border-border p-2">{children}</td>
-                    ),
-                  }}
-                >
-                  {content || '*Nota vazia*'}
-                </ReactMarkdown>
-              </div>
-            </div>
-          ) : (
-            <Textarea
-              placeholder="Escreva sua nota em Markdown..."
-              value={content}
-              onChange={(e) => handleContentChange(e.target.value)}
-              className="h-full w-full border-none resize-none focus-visible:ring-0 px-8 py-0 font-mono text-sm leading-relaxed bg-transparent notion-scrollbar"
-              ref={textareaRef}
+      {/* Editor/Preview Area - Scrollbar na lateral direita */}
+      <div className="flex-1 overflow-y-auto notion-scrollbar py-6">
+        <div className="flex items-start justify-center min-h-full">
+          <div className="w-full max-w-4xl">
+            <TipTapEditor
+              content={content}
+              onChange={handleContentChange}
+              placeholder="Escreva sua nota..."
+              className="h-full w-full border-none resize-none focus-visible:ring-0"
+              ref={editorRef}
+
             />
-          )}
+          </div>
         </div>
       </div>
 
@@ -289,84 +236,36 @@ export default function Home() {
               <Minimize2 className="h-4 w-4" />
               Sair do Foco
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsPreviewMode(!isPreviewMode)}
-            >
-              {isPreviewMode ? <Edit className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              {isPreviewMode ? 'Editar' : 'Visualizar'}
-            </Button>
+
             <Button size="sm" onClick={handleSave} disabled={!hasChanges}>
               <Save className="h-4 w-4 mr-2" />
               Salvar
             </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleDelete}
+              className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Apagar
+            </Button>
           </div>
         </div>
 
-        {/* Área principal centralizada */}
-        <div className="flex-1 overflow-hidden py-8 flex items-start justify-center">
-          <div className="w-full max-w-5xl h-full overflow-y-auto notion-scrollbar">
-            {isPreviewMode ? (
-              <div className="px-12">
-                <div className="prose prose-slate max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted">
-                  <ReactMarkdown 
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      h1: ({children}) => <h1 className="text-3xl font-bold mb-4 text-foreground">{children}</h1>,
-                      h2: ({children}) => <h2 className="text-2xl font-semibold mb-3 text-foreground">{children}</h2>,
-                      h3: ({children}) => <h3 className="text-xl font-medium mb-2 text-foreground">{children}</h3>,
-                      p: ({children}) => <p className="mb-4 text-foreground leading-relaxed">{children}</p>,
-                      ul: ({children}) => <ul className="list-disc list-inside mb-4 space-y-1">{children}</ul>,
-                      ol: ({children}) => <ol className="list-decimal list-inside mb-4 space-y-1">{children}</ol>,
-                      li: ({children}) => <li className="text-foreground">{children}</li>,
-                      code: ({children, className}) => {
-                        const match = /language-(\w+)/.exec(className || '');
-                        return match ? (
-                          <pre className="bg-muted p-4 rounded-lg overflow-x-auto mb-4">
-                            <code className="text-sm font-mono text-foreground">{children}</code>
-                          </pre>
-                        ) : (
-                          <code className="bg-muted px-1 py-0.5 rounded text-sm font-mono text-foreground">{children}</code>
-                        );
-                      },
-                      blockquote: ({children}) => (
-                        <blockquote className="border-l-4 border-primary pl-4 italic mb-4 text-muted-foreground">
-                          {children}
-                        </blockquote>
-                      ),
-                      hr: () => <hr className="my-6 border-border" />,
-                      a: ({children, href}) => (
-                        <a href={href} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
-                          {children}
-                        </a>
-                      ),
-                      table: ({children}) => (
-                        <div className="overflow-x-auto mb-4">
-                          <table className="min-w-full border border-border">{children}</table>
-                        </div>
-                      ),
-                      th: ({children}) => (
-                        <th className="border border-border bg-muted p-2 text-left font-semibold">{children}</th>
-                      ),
-                      td: ({children}) => (
-                        <td className="border border-border p-2">{children}</td>
-                      ),
-                    }}
-                  >
-                    {content || '*Nota vazia*'}
-                  </ReactMarkdown>
-                </div>
-              </div>
-            ) : (
-              <Textarea
-                placeholder="Escreva sua nota em Markdown..."
-                value={content}
-                onChange={(e) => handleContentChange(e.target.value)}
-                className="h-full w-full border-none resize-none focus-visible:ring-0 px-12 py-0 font-mono text-sm leading-relaxed bg-transparent notion-scrollbar"
-                ref={focusTextareaRef}
+        {/* Editor/Preview Area - Modo Foco com Scrollbar na lateral direita */}
+        <div className="flex-1 overflow-y-auto notion-scrollbar py-8">
+          <div className="flex items-start justify-center min-h-full">
+            <div className="w-full max-w-5xl">
+              <TipTapEditor
+                content={content}
+                onChange={handleContentChange}
+                placeholder="Escreva sua nota..."
+                className="h-full w-full border-none resize-none focus-visible:ring-0"
+                ref={focusEditorRef}
+                
               />
-            )}
+            </div>
           </div>
         </div>
 
@@ -376,6 +275,18 @@ export default function Home() {
           lastSaved={lastSaved}
           hasChanges={hasChanges}
         />
+
+        {/* Modal de Confirmação - Modo Foco */}
+        <ConfirmationModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={confirmDelete}
+          title="Apagar Nota"
+          message={`Tem certeza que deseja apagar a nota "${currentNote?.title || 'Nota sem título'}"?\n\nEsta ação não pode ser desfeita.`}
+          confirmText="Apagar"
+          cancelText="Cancelar"
+          variant="destructive"
+        />
       </div>
     );
   }
@@ -384,6 +295,18 @@ export default function Home() {
   return (
     <AppLayout>
       {editorContent}
+      
+      {/* Modal de Confirmação */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title="Apagar Nota"
+        message={`Tem certeza que deseja apagar a nota "${currentNote?.title || 'Nota sem título'}"?\n\nEsta ação não pode ser desfeita.`}
+        confirmText="Apagar"
+        cancelText="Cancelar"
+        variant="destructive"
+      />
     </AppLayout>
   );
 }

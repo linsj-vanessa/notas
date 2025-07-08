@@ -5,6 +5,8 @@ export interface Note {
   createdAt: Date;
   updatedAt: Date;
   tags?: string[];
+  isDeleted?: boolean;
+  deletedAt?: Date;
 }
 
 export interface NotePreview {
@@ -14,6 +16,8 @@ export interface NotePreview {
   createdAt: Date;
   updatedAt: Date;
   tags?: string[];
+  isDeleted?: boolean;
+  deletedAt?: Date;
 }
 
 export interface CreateNoteData {

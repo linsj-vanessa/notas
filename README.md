@@ -6,6 +6,17 @@
 
 Editor de notas em Markdown com armazenamento local usando IndexedDB. Todas as suas notas ficam salvas no seu navegador de forma segura e privada.
 
+## 🚀 **Destaque: Editor Rico TipTap - WYSIWYG Moderno**
+
+**A principal funcionalidade do Notas App é o editor rico TipTap!** Editor WYSIWYG moderno que mostra formatação em tempo real:
+
+- 📝 **Editor WYSIWYG** - Vê a formatação conforme digita (sem preview separado)
+- ⚡ **Formatação Rica** - **Negrito**, *itálico*, # títulos, listas, links
+- 🎯 **Atalhos de Teclado** - Ctrl+B, Ctrl+I e outros atalhos padrão
+- 🔄 **Zero Fricção** - Edição visual direta, sem alternar modos
+
+Similar aos melhores editores modernos como **Notion**, **Obsidian** e **Typora**!
+
 ## ✨ Funcionalidades
 
 ### 📝 **Gestão de Notas**
@@ -13,8 +24,10 @@ Editor de notas em Markdown com armazenamento local usando IndexedDB. Todas as s
 - ✅ **Foco Automático**: Cursor vai AUTOMATICAMENTE para o campo de texto ao criar nova nota - zero cliques extras!
 - ✅ Editar notas em tempo real
 - ✅ Salvar automático (2 segundos de inatividade)
-- ✅ Deletar notas (com confirmação)
-- ✅ Buscar notas por título ou conteúdo
+- ✅ **Sistema de Lixeira**: Notas deletadas vão para lixeira ao invés de exclusão permanente
+- ✅ **Recuperação de Notas**: Restaurar notas da lixeira facilmente
+- ✅ **Limpeza Automática**: Lixeira limpa automaticamente após 30 dias
+- ✅ Buscar notas por título ou conteúdo (exclui automaticamente notas da lixeira)
 - ✅ Visualizar lista de notas na sidebar
 
 ### 📊 **Barra de Status e Estatísticas**
@@ -38,14 +51,24 @@ Editor de notas em Markdown com armazenamento local usando IndexedDB. Todas as s
 - ✅ Aplicação dinâmica das cores
 
 ### 📱 **Interface e Experiência**
-- ✅ **Editor Centralizado**: Caixinha elegante e centralizada para escrita
-- ✅ **Background Suave**: Fundo discreto que destaca o conteúdo
-- ✅ **Modo Foco Aprimorado**: Tela cheia com editor centralizado e interface limpa
+- ✅ **Editor Rico TipTap**: WYSIWYG moderno com formatação visual em tempo real
+- ✅ **Atalhos de Teclado**: Ctrl+B para negrito, Ctrl+I para itálico, etc.
+- ✅ **Formatação Rica**: Títulos, listas, links, código, citações e tabelas
+- ✅ **Modo Foco Aprimorado**: Editor fullscreen para máxima concentração
 - ✅ Interface responsiva e moderna
-- ✅ Modo de visualização Markdown
-- ✅ Modo de edição com syntax highlighting
-- ✅ Atalhos visuais intuitivos
-- ✅ Confirmações de segurança
+- ✅ Renderização visual completa sem necessidade de preview
+- ✅ Placeholder dinâmico e responsivo
+- ✅ Modais de confirmação elegantes (sem alerts nativos)
+
+### 🗑️ **Sistema de Lixeira**
+- ✅ **Exclusão Segura**: Notas deletadas vão para lixeira ao invés de exclusão permanente
+- ✅ **Visualização Dedicada**: Interface especializada para gerenciar notas da lixeira
+- ✅ **Recuperação Fácil**: Restaurar notas da lixeira com um clique
+- ✅ **Exclusão Permanente**: Opção de deletar permanentemente apenas na lixeira
+- ✅ **Limpeza Automática**: Notas antigas (30+ dias) são removidas automaticamente
+- ✅ **Indicador Visual**: Badge vermelho mostra quantidade de notas na lixeira
+- ✅ **Navegação Simples**: Alternância fácil entre notas ativas e lixeira
+- ✅ **Operações em Lote**: Opção de esvaziar lixeira completamente
 
 ### 💾 **Armazenamento**
 - ✅ Armazenamento local no navegador (IndexedDB)
@@ -72,14 +95,20 @@ Editor de notas em Markdown com armazenamento local usando IndexedDB. Todas as s
 - **Status de Salvamento**: Indicador visual de mudanças não salvas
 - **Última Salvamento**: Horário preciso da última alteração
 
-### 4. **Alternar entre Visualização e Edição**
-- Use o botão "Visualizar" para ver a nota renderizada
-- Use o botão "Editar" para voltar ao modo de edição
+### 4. **Editor Rico com TipTap**
+- **Formatação Visual**: Veja negrito, itálico, títulos conforme digita
+- **Atalhos de Teclado**: Use Ctrl+B, Ctrl+I e outros atalhos padrão
+- **Listas Inteligentes**: Digite `- ` ou `1. ` para criar listas automaticamente
+- **Links e Código**: Suporte completo a links e blocos de código inline
 
-### 5. **Deletar Notas**
-- **Pela sidebar**: Passe o mouse sobre a nota e clique no ícone 🗑️
-- **Pelo cabeçalho**: Clique no botão "Apagar" quando a nota estiver aberta
-- Confirme a exclusão na janela de confirmação
+### 5. **Sistema de Lixeira**
+- **Deletar Notas**: Passe o mouse sobre a nota e clique no ícone 🗑️ ou use o botão "Apagar" no cabeçalho
+- **Lixeira Inteligente**: Notas deletadas vão para lixeira ao invés de exclusão permanente
+- **Acessar Lixeira**: Clique no botão "Lixeira" na sidebar (com badge vermelho se houver notas)
+- **Restaurar Notas**: Na lixeira, clique no botão "Restaurar" para recuperar uma nota
+- **Exclusão Permanente**: Na lixeira, clique no botão "Deletar" para excluir permanentemente
+- **Esvaziar Lixeira**: Use o botão "Esvaziar Lixeira" para remover todas as notas da lixeira
+- **Limpeza Automática**: Notas ficam na lixeira por 30 dias antes de serem removidas automaticamente
 
 ### 6. **Trocar Tema**
 - Clique no botão "Tema" no cabeçalho
@@ -93,7 +122,7 @@ Editor de notas em Markdown com armazenamento local usando IndexedDB. Todas as s
 ### 7. **Buscar Notas**
 - Use o campo de busca no cabeçalho
 - Digite título ou conteúdo para filtrar as notas
-- A busca é instantânea
+- A busca é instantânea e exclui automaticamente notas da lixeira
 
 ### 8. **Interface Centralizada e Estética**
 - **Caixinha do Editor**: O editor agora aparece em uma caixa elegante e centralizada
@@ -107,9 +136,9 @@ Editor de notas em Markdown com armazenamento local usando IndexedDB. Todas as s
 - **Next.js 15.3.5**: Framework React moderno
 - **TypeScript**: Tipagem estática
 - **Tailwind CSS 3.4.16**: Estilização utilitária
+- **TipTap**: Editor rico WYSIWYG moderno
 - **Dexie.js**: Wrapper para IndexedDB
 - **Zustand**: Gerenciamento de estado
-- **React Markdown**: Renderização de Markdown
 - **date-fns**: Manipulação de datas
 - **Lucide React**: Ícones modernos
 

@@ -5,6 +5,143 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2025-01-08
+
+### ✨ Sistema de Lixeira Completo (MAJOR UPDATE)
+- **Lixeira Inteligente**: Notas deletadas são movidas para lixeira ao invés de exclusão permanente
+- **Recuperação Fácil**: Funcionalidade completa de restaurar notas da lixeira
+- **Exclusão Segura**: Opção de exclusão permanente apenas na lixeira
+- **Limpeza Automática**: Notas antigas na lixeira são removidas automaticamente após 30 dias
+- **Interface Dedicada**: Visualização especializada da lixeira com interface intuitiva
+- **Navegação Simples**: Alternância fácil entre notas ativas e lixeira
+
+### 🎯 Indicadores Visuais da Lixeira
+- **Badge com Contador**: Indicador visual mostrando quantidade de notas na lixeira
+- **Atualização Automática**: Contador atualizado automaticamente a cada 30 segundos
+- **Código de Cores**: Badge vermelho para destacar presença de notas na lixeira
+- **Feedback Instantâneo**: Contador atualizado imediatamente após ações de delete/restore
+
+### 🔧 Melhorias na Experiência do Usuário
+- **Prevenção de Perda**: Eliminado risco de perda acidental de notas importantes
+- **Confirmação Dupla**: Modais de confirmação para ações destrutivas
+- **Busca Inteligente**: Resultados de busca excluem automaticamente notas da lixeira
+- **Informações Contextuais**: Datas de criação e exclusão visíveis na lixeira
+- **Operações em Lote**: Opção de esvaziar lixeira completamente
+
+### 🛠️ Arquitetura Técnica
+- **Banco de Dados**: Esquema atualizado para versão 2 com campos `isDeleted` e `deletedAt`
+- **Soft Delete**: Implementação de exclusão lógica ao invés de física
+- **Scheduler Automático**: Sistema de limpeza periódica com intervalo configurável
+- **Componente TrashView**: Interface especializada para gestão da lixeira
+- **Funções do Store**: `moveToTrash`, `restoreFromTrash`, `permanentDelete`, `emptyTrash`
+
+### 🔄 Migração e Compatibilidade
+- **Migração Transparente**: Notas existentes migradas automaticamente
+- **Compatibilidade**: Funciona com todas as notas criadas anteriormente
+- **Performance**: Otimizado para grandes quantidades de notas
+- **Manutenção**: Limpeza automática mantém banco de dados limpo
+
+## [1.9.0] - 2025-01-08
+
+### ✨ Editor Rico com TipTap (MAJOR UPDATE)
+- **Editor WYSIWYG**: Substituído textarea simples por editor rico TipTap
+- **Formatação Rica**: Suporte nativo a **negrito**, *itálico*, títulos H1-H6
+- **Listas Inteligentes**: Listas numeradas e com marcadores com auto-indentação
+- **Links e Código**: Suporte completo a links e blocos de código
+- **Citações**: Blockquotes com formatação visual elegante
+- **Tabelas**: Criação e edição de tabelas markdown diretamente no editor
+
+### 🎯 Experiência de Edição Moderna
+- **Visual Instantâneo**: Vê a formatação conforme digita (sem necessidade de preview)
+- **Atalhos de Teclado**: Ctrl+B, Ctrl+I e outros atalhos padrão funcionam
+- **Placeholder Dinâmico**: Placeholder personalizado e responsivo
+- **Foco Automático**: Cursor automático em novas notas mantido
+- **Performance**: Editor otimizado para grandes documentos
+
+### 🔧 Integração Perfeita
+- **Sistema Existente**: Integrado completamente com save automático
+- **Modo Foco**: TipTap funciona perfeitamente no modo foco
+- **Temas**: Suporte completo aos temas claro/escuro existentes
+- **Scrollbar Notion**: Mantida experiência de scroll customizada
+- **StatusBar**: Contagem de caracteres e estatísticas mantidas
+
+### 📦 Técnico - TipTap
+- **Dependências**: @tiptap/react, @tiptap/starter-kit, extensões Typography, Placeholder
+- **Componente Customizado**: `TipTapEditor` com ref forwarding e props flexíveis
+- **Conversão HTML**: Função auxiliar para conversão HTML → Markdown
+- **Estilos Integrados**: CSS customizado alinhado com design system existente
+- **StarterKit**: Configuração completa com headings, listas, formatação
+
+### 🔄 Migração Técnica
+- **Remoção Preview**: Sistema de preview automático removido (não mais necessário)
+- **Refs Atualizadas**: Migradas de TextareaRef para TipTapEditorRef
+- **Lógica Simplificada**: Código mais limpo sem sistema dual preview/edit
+- **ReactMarkdown**: Removido react-markdown e remark-gfm das dependências
+
+## [1.8.0] - 2025-01-08
+
+### ✨ Preview Automático Inline - Estilo Obsidian/Notion (MAJOR UPDATE)
+- **Preview No Mesmo Local**: Markdown renderizado automaticamente na mesma área onde você digita
+- **Timer Inteligente**: 3 segundos após parar de digitar → automaticamente vira preview
+- **Clique para Editar**: Clique no preview para voltar instantaneamente ao modo edição
+- **Experiência Fluida**: Similar ao Obsidian, Notion e outros editores WYSIWYG modernos
+- **Foco Automático**: Cursor automaticamente no textarea ao voltar para edição
+
+### 🎯 Indicadores Visuais Intuitivos
+- **Badge de Preview**: Indicador "📖 Preview - Clique para editar" no canto superior direito
+- **Hover Effect**: Fundo sutil aparece ao passar mouse sobre o preview
+- **Cursor de Texto**: Indicação visual clara de que é clicável para editar
+- **Transições Suaves**: Animações de 200ms para mudanças de estado
+
+### 🔧 Melhorado
+- **UX Obsidian-Style**: Experiência de edição similar aos melhores editores markdown
+- **Fluxo Zero-Friction**: Sem botões para apertar, tudo automático e intuitivo
+- **Detecção Inteligente**: Sistema detecta quando você está editando vs. lendo
+- **Modo Foco Consistente**: Mesma experiência automática no modo foco
+- **Performance**: Timer otimizado que não interfere na digitação
+
+### 🔄 Comportamento Automático
+- **Timer de 3s**: Preview automático após 3 segundos de inatividade
+- **Volta Instantânea**: Qualquer digitação volta imediatamente para edição
+- **Notas Novas**: Sempre começam em modo edição com foco no textarea
+- **Preserva Estado**: Lembra se você estava editando ou visualizando
+
+### 📦 Técnico
+- Timer `useEffect` com cleanup para preview automático
+- Estado `isPreviewMode` reintroduzido para controle automático
+- Função `handlePreviewClick` com foco automático no textarea
+- Indicadores visuais com Tailwind CSS e transições
+- Layout responsivo mantido com preview inline
+
+## [1.7.7] - 2025-01-08
+
+### ✨ Modal de Confirmação Personalizado
+- **Interface Elegante**: Substituído alert nativo por modal customizado para exclusão de notas
+- **Design Consistente**: Modal segue o design system do app com bordas, sombras e animações
+- **Ícone de Alerta**: Ícone de triangulo de alerta para melhor comunicação visual
+- **Botão de Fechar**: X no canto superior direito para fechar o modal
+- **Backdrop Clicável**: Clicar fora do modal fecha a confirmação
+- **Animação Suave**: Transição fade-in e zoom-in com duração de 200ms
+
+### 🔧 Melhorado
+- **UX Profissional**: Experiência mais polida comparado aos alerts nativos do navegador
+- **Consistência Visual**: Modal integrado com os temas existentes do app
+- **Acessibilidade**: Botões bem definidos com cores e tamanhos adequados
+- **Funcionalidade Completa**: Modal disponível tanto na sidebar quanto no modo foco
+- **Responsividade**: Modal se adapta a diferentes tamanhos de tela
+
+### 🐛 Corrigido
+- **Botão Apagar Modo Foco**: Adicionado botão de apagar no cabeçalho do modo foco
+- **Alerts Nativos**: Removidos todos os alerts nativos de confirmação
+- **Consistência de Interface**: Todas as confirmações agora usam o mesmo modal
+
+### 📦 Técnico
+- Novo componente `ConfirmationModal` em `components/ui/`
+- Estado de modal adicionado em `AppLayout` e `page.tsx`
+- Props configuráveis: título, mensagem, textos dos botões, variante
+- Suporte a backdrop click e tecla ESC (via botão X)
+- Z-index 50 para garantir sobreposição correta
+
 ## [1.7.6] - 2025-01-08
 
 ### ✨ Foco Automático em Novas Notas - CORRIGIDO

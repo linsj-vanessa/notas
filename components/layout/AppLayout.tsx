@@ -1,13 +1,16 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { PlusCircle, Search, Menu, FileText, Clock, Trash2 } from 'lucide-react';
+import { PlusCircle, Search, Menu, FileText, Clock, Trash2, ArrowLeft } from 'lucide-react';
 import { useNotesStore } from '@/lib/store';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import ThemeSelector from '@/components/ui/theme-selector';
+import { ConfirmationModal } from '@/components/ui/confirmation-modal';
+import { TrashView } from '@/components/ui/trash-view';
+import { useCleanupScheduler } from '@/lib/cleanup-scheduler';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -27,9 +30,56 @@ export default function AppLayout({ children }: AppLayoutProps) {
     getFilteredNotes,
   } = useNotesStore();
 
+  // Estado para controlar o modal de confirmação
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    noteId: string;
+    noteTitle: string;
+  }>({
+    isOpen: false,
+    noteId: '',
+    noteTitle: ''
+  });
+
+  // Estado para controlar se estamos visualizando a lixeira
+  const [showTrash, setShowTrash] = useState(false);
+  const [trashCount, setTrashCount] = useState(0);
+
+  // Scheduler para limpeza automática
+  const { startCleanup, stopCleanup } = useCleanupScheduler();
+
   useEffect(() => {
     loadNotes();
   }, [loadNotes]);
+
+  // Função para atualizar contador da lixeira
+  const updateTrashCount = async () => {
+    try {
+      const { getTrashNotes } = useNotesStore.getState();
+      const trashNotes = await getTrashNotes();
+      setTrashCount(trashNotes.length);
+    } catch (error) {
+      console.error('Error updating trash count:', error);
+    }
+  };
+
+  // Atualizar contador da lixeira periodicamente
+  useEffect(() => {
+    updateTrashCount();
+    const interval = setInterval(updateTrashCount, 30000); // Atualizar a cada 30 segundos
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  // Inicializar scheduler de limpeza
+  useEffect(() => {
+    startCleanup();
+    
+    // Cleanup ao desmontar
+    return () => {
+      stopCleanup();
+    };
+  }, [startCleanup, stopCleanup]);
 
   const handleCreateNote = async () => {
     try {
@@ -43,21 +93,36 @@ export default function AppLayout({ children }: AppLayoutProps) {
     setCurrentNote(note);
   };
 
-  const handleDeleteNote = async (noteId: string, noteTitle: string, e: React.MouseEvent) => {
+  const handleDeleteNote = (noteId: string, noteTitle: string, e: React.MouseEvent) => {
     e.stopPropagation(); // Evita que a nota seja selecionada ao clicar no delete
     
-    const confirmed = confirm(
-      `Tem certeza que deseja apagar a nota "${noteTitle || 'Nota sem título'}"?\n\nEsta ação não pode ser desfeita.`
-    );
-    
-    if (confirmed) {
-      try {
-        await deleteNote(noteId);
-      } catch (error) {
-        console.error('Error deleting note:', error);
-        alert('Erro ao apagar a nota. Tente novamente.');
-      }
+    // Abre o modal de confirmação
+    setDeleteModal({
+      isOpen: true,
+      noteId,
+      noteTitle: noteTitle || 'Nota sem título'
+    });
+  };
+
+  // Função para confirmar a exclusão
+  const confirmDeleteNote = async () => {
+    try {
+      await deleteNote(deleteModal.noteId);
+      // Atualizar contador da lixeira após deletar
+      updateTrashCount();
+    } catch (error) {
+      console.error('Error deleting note:', error);
+      alert('Erro ao apagar a nota. Tente novamente.');
     }
+  };
+
+  // Função para fechar o modal
+  const closeDeleteModal = () => {
+    setDeleteModal({
+      isOpen: false,
+      noteId: '',
+      noteTitle: ''
+    });
   };
 
   const filteredNotes = getFilteredNotes();
@@ -92,10 +157,40 @@ export default function AppLayout({ children }: AppLayoutProps) {
         {/* Sidebar */}
         <aside className="w-80 border-r border-border bg-background overflow-y-auto notion-scrollbar">
           <div className="p-4">
-            <div className="space-y-2">
-              <h2 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
-                Suas Notas ({filteredNotes.length})
-              </h2>
+            <div className="space-y-4">
+              {/* Navegação */}
+              <div className="space-y-2">
+                <Button
+                  variant={!showTrash ? "default" : "ghost"}
+                  size="sm"
+                  className="w-full justify-start"
+                  onClick={() => setShowTrash(false)}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Notas ({filteredNotes.length})
+                </Button>
+                <Button
+                  variant={showTrash ? "default" : "ghost"}
+                  size="sm"
+                  className="w-full justify-start relative"
+                  onClick={() => setShowTrash(true)}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Lixeira
+                  {trashCount > 0 && (
+                    <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 min-w-[1.25rem] h-5 flex items-center justify-center">
+                      {trashCount}
+                    </span>
+                  )}
+                </Button>
+              </div>
+
+              {/* Lista de notas - só mostra se não estiver na lixeira */}
+              {!showTrash && (
+                <div className="space-y-2">
+                  <h2 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
+                    Suas Notas ({filteredNotes.length})
+                  </h2>
               <div className="space-y-1">
                 {isLoading ? (
                   <div className="text-sm text-muted-foreground p-2">
@@ -154,14 +249,28 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 )}
               </div>
             </div>
+              )}
+            </div>
           </div>
         </aside>
 
         {/* Main Content */}
         <main className="flex-1 overflow-hidden">
-          {children}
+          {showTrash ? <TrashView /> : children}
         </main>
       </div>
+
+      {/* Modal de Confirmação */}
+      <ConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={closeDeleteModal}
+        onConfirm={confirmDeleteNote}
+        title="Apagar Nota"
+        message={`Tem certeza que deseja apagar a nota "${deleteModal.noteTitle}"?\n\nEsta ação não pode ser desfeita.`}
+        confirmText="Apagar"
+        cancelText="Cancelar"
+        variant="destructive"
+      />
     </div>
   );
 } 
