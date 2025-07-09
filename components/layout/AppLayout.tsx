@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useNotesStore } from '@/lib/stores';
+import { useAppStoreManager } from '@/lib/stores/appStoreManager';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import { TrashView } from '@/components/ui/trash-view';
+import { FallbackAlert } from '@/components/ui/fallback-alert';
 import { useNoteOperations } from '@/hooks/useNoteOperations';
 import { useTrashOperations } from '@/hooks/useTrashOperations';
 import AppHeader from './AppHeader';
@@ -18,12 +19,11 @@ interface AppLayoutProps {
 export default function AppLayout({ children }: AppLayoutProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { loadNotes } = useNotesStore();
+  const { loadNotes, deleteNote } = useAppStoreManager();
   
   const { 
     handleCreateNote: createNoteHook, 
     handleSelectNote, 
-    handleDeleteNote: deleteNoteHook,
     getTextFromHtml 
   } = useNoteOperations();
   
@@ -75,7 +75,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
   const confirmDeleteNote = async () => {
     try {
-      await deleteNoteHook(deleteModal.noteId);
+      await deleteNote(deleteModal.noteId);
       await updateTrashCount();
     } catch (error) {
       console.error('Error deleting note:', error);
@@ -127,6 +127,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
           {showTrash ? <TrashView /> : children}
         </main>
       </div>
+
+      {/* Alerta de fallback quando filesystem não funciona */}
+      <FallbackAlert />
 
       <ConfirmationModal
         isOpen={deleteModal.isOpen}

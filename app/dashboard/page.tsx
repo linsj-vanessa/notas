@@ -20,9 +20,4 @@ export default function DashboardPage() {
       </div>
     </AppLayout>
   );
-}
-
-export const metadata = {
-  title: 'Dashboard de Produtividade | Notas App',
-  description: 'Acompanhe seu progresso e insights de escrita',
-}; 
+} 

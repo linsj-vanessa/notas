@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useRef } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
-import { useNotesStore, useUIStore, useTrashStore } from '@/lib/stores';
+import { useUIStore } from '@/lib/stores';
+import { useAppStoreManager } from '@/lib/stores/appStoreManager';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Save, Eye, Edit, Trash2, Maximize2, Minimize2 } from 'lucide-react';
@@ -12,17 +13,18 @@ import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 
 export default function Home() {
   const { 
-    currentNote, 
+    getCurrentNote, 
     updateNote, 
-    setCurrentNote 
-  } = useNotesStore();
+    setCurrentNote,
+    deleteNote
+  } = useAppStoreManager();
   
   const { 
     isFocusMode, 
     setFocusMode 
   } = useUIStore();
   
-  const { deleteNote } = useTrashStore();
+  const currentNote = getCurrentNote();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 

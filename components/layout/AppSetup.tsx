@@ -55,8 +55,16 @@ export const AppSetup = ({ children }: AppSetupProps) => {
   // Inicializar setup ao montar o componente
   useEffect(() => {
     // Pequeno delay para garantir que todos os stores estejam hidratados
-    const timer = setTimeout(() => {
-      initializeSetup();
+    const timer = setTimeout(async () => {
+      try {
+        initializeSetup();
+        
+        // Inicializar o AppStoreManager após o setup
+        const { initialize } = useAppStoreManager.getState();
+        await initialize();
+      } catch (error) {
+        console.error('Erro na inicialização:', error);
+      }
     }, 100);
     
     return () => clearTimeout(timer);
