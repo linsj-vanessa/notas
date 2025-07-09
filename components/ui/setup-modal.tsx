@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Database, HardDrive, Palette, Check } from 'lucide-react';
+import { X, Database, HardDrive, Palette, Check, Folder } from 'lucide-react';
 import { useSetupStore, type StorageType } from '@/lib/stores/setupStore';
+import { useFileNotesStore } from '@/lib/stores/fileNotesStore';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from './button';
 import { Card } from './card';
@@ -68,19 +69,59 @@ export const SetupModal = ({ isOpen, onClose }: SetupModalProps) => {
     clearError 
   } = useSetupStore();
   
+  const { setDirectoryHandle } = useFileNotesStore();
   const { availableThemes } = useTheme();
-  const [step, setStep] = useState<'storage' | 'theme' | 'confirm'>('storage');
+  const [step, setStep] = useState<'storage' | 'directory' | 'theme' | 'confirm'>('storage');
+  const [selectedDirectory, setSelectedDirectory] = useState<FileSystemDirectoryHandle | null>(null);
+  const [directoryError, setDirectoryError] = useState<string | null>(null);
 
   // Limpar erro ao abrir o modal
   useEffect(() => {
     if (isOpen) {
       clearError();
+      setDirectoryError(null);
     }
   }, [isOpen, clearError]);
 
   const handleStorageSelect = (type: StorageType) => {
     setTempStorageType(type);
-    setStep('theme');
+    
+    // Se for IndexedDB, pular a seleção de diretório
+    if (type === 'indexeddb') {
+      setStep('theme');
+    } else {
+      setStep('directory');
+    }
+  };
+
+  const handleDirectorySelect = async () => {
+    try {
+      setDirectoryError(null);
+      
+      // Verificar se o File System Access API está disponível
+      if (!('showDirectoryPicker' in window)) {
+        setDirectoryError('Seu navegador não suporta o File System Access API. Tente usar Chrome ou Edge.');
+        return;
+      }
+      
+      // Solicitar seleção de diretório
+      const directoryHandle = await (window as typeof window & {
+        showDirectoryPicker: (options?: { mode?: string }) => Promise<FileSystemDirectoryHandle>
+      }).showDirectoryPicker({
+        mode: 'readwrite',
+      });
+      
+      setSelectedDirectory(directoryHandle);
+      setDirectoryHandle(directoryHandle);
+      setStep('theme');
+      
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        setDirectoryError('Seleção de pasta cancelada. Por favor, selecione uma pasta para continuar.');
+      } else {
+        setDirectoryError(`Erro ao acessar o diretório: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+      }
+    }
   };
 
   const handleThemeSelect = (themeId: string) => {
@@ -96,14 +137,34 @@ export const SetupModal = ({ isOpen, onClose }: SetupModalProps) => {
   };
 
   const handleBack = () => {
-    if (step === 'theme') {
+    if (step === 'directory') {
       setStep('storage');
+    } else if (step === 'theme') {
+      if (tempStorageType === 'filesystem') {
+        setStep('directory');
+      } else {
+        setStep('storage');
+      }
     } else if (step === 'confirm') {
       setStep('theme');
     }
   };
 
   if (!isOpen) return null;
+
+  const getStepNumber = () => {
+    switch (step) {
+      case 'storage': return 1;
+      case 'directory': return 2;
+      case 'theme': return tempStorageType === 'filesystem' ? 3 : 2;
+      case 'confirm': return tempStorageType === 'filesystem' ? 4 : 3;
+      default: return 1;
+    }
+  };
+
+  const getTotalSteps = () => {
+    return tempStorageType === 'filesystem' ? 4 : 3;
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -132,7 +193,8 @@ export const SetupModal = ({ isOpen, onClose }: SetupModalProps) => {
 
         {/* Progress */}
         <div className="px-6 py-4 bg-muted/30">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            {/* Step 1: Storage */}
             <div className={`flex items-center space-x-2 ${step === 'storage' ? 'text-primary' : tempStorageType ? 'text-green-600' : 'text-muted-foreground'}`}>
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                 tempStorageType ? 'bg-green-600 text-white' : step === 'storage' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
@@ -144,22 +206,40 @@ export const SetupModal = ({ isOpen, onClose }: SetupModalProps) => {
             
             <div className="flex-1 h-px bg-border"></div>
             
+            {/* Step 2: Directory (only for filesystem) */}
+            {tempStorageType === 'filesystem' && (
+              <>
+                <div className={`flex items-center space-x-2 ${step === 'directory' ? 'text-primary' : selectedDirectory ? 'text-green-600' : 'text-muted-foreground'}`}>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                    selectedDirectory ? 'bg-green-600 text-white' : step === 'directory' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {selectedDirectory ? <Check className="w-3 h-3" /> : '2'}
+                  </div>
+                  <span className="text-sm font-medium">Pasta</span>
+                </div>
+                
+                <div className="flex-1 h-px bg-border"></div>
+              </>
+            )}
+            
+            {/* Step: Theme */}
             <div className={`flex items-center space-x-2 ${step === 'theme' ? 'text-primary' : tempTheme ? 'text-green-600' : 'text-muted-foreground'}`}>
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                 tempTheme ? 'bg-green-600 text-white' : step === 'theme' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
               }`}>
-                {tempTheme ? <Check className="w-3 h-3" /> : '2'}
+                {tempTheme ? <Check className="w-3 h-3" /> : getStepNumber() === getTotalSteps() - 1 ? getStepNumber() : tempStorageType === 'filesystem' ? '3' : '2'}
               </div>
               <span className="text-sm font-medium">Tema</span>
             </div>
             
             <div className="flex-1 h-px bg-border"></div>
             
+            {/* Step: Confirm */}
             <div className={`flex items-center space-x-2 ${step === 'confirm' ? 'text-primary' : 'text-muted-foreground'}`}>
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                 step === 'confirm' ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
               }`}>
-                3
+                {getTotalSteps()}
               </div>
               <span className="text-sm font-medium">Confirmar</span>
             </div>
@@ -168,9 +248,9 @@ export const SetupModal = ({ isOpen, onClose }: SetupModalProps) => {
 
         {/* Content */}
         <div className="p-6 max-h-[60vh] overflow-y-auto">
-          {error && (
+          {(error || directoryError) && (
             <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-              <p className="text-destructive text-sm">{error}</p>
+              <p className="text-destructive text-sm">{error || directoryError}</p>
             </div>
           )}
 
@@ -238,7 +318,59 @@ export const SetupModal = ({ isOpen, onClose }: SetupModalProps) => {
             </div>
           )}
 
-          {/* Step 2: Theme Selection */}
+          {/* Step 2: Directory Selection (only for filesystem) */}
+          {step === 'directory' && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <Folder className="w-12 h-12 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Selecione uma pasta para suas notas
+                </h3>
+                <p className="text-muted-foreground">
+                  Escolha onde suas notas serão salvas no seu computador
+                </p>
+              </div>
+
+              <div className="max-w-md mx-auto">
+                <Card className="p-6 text-center">
+                  {selectedDirectory ? (
+                    <div className="space-y-4">
+                      <Check className="w-12 h-12 text-green-600 mx-auto" />
+                      <div>
+                        <h4 className="font-semibold text-foreground mb-2">Pasta selecionada</h4>
+                        <p className="text-sm text-muted-foreground break-all">
+                          {selectedDirectory.name}
+                        </p>
+                      </div>
+                      <Button variant="outline" onClick={handleDirectorySelect}>
+                        Alterar pasta
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <Folder className="w-12 h-12 text-muted-foreground mx-auto" />
+                      <div>
+                        <h4 className="font-semibold text-foreground mb-2">Nenhuma pasta selecionada</h4>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Selecione uma pasta onde suas notas serão salvas como arquivos .md
+                        </p>
+                      </div>
+                      <Button onClick={handleDirectorySelect}>
+                        <Folder className="w-4 h-4 mr-2" />
+                        Selecionar pasta
+                      </Button>
+                    </div>
+                  )}
+                </Card>
+                
+                <div className="mt-4 text-xs text-muted-foreground text-center">
+                  💡 A pasta será organizada automaticamente com subpastas para notas ativas e lixeira
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Theme Selection */}
           {step === 'theme' && (
             <div className="space-y-6">
               <div className="text-center">
@@ -291,7 +423,7 @@ export const SetupModal = ({ isOpen, onClose }: SetupModalProps) => {
             </div>
           )}
 
-          {/* Step 3: Confirmation */}
+          {/* Step 4: Confirmation */}
           {step === 'confirm' && (
             <div className="space-y-6">
               <div className="text-center">
@@ -311,6 +443,15 @@ export const SetupModal = ({ isOpen, onClose }: SetupModalProps) => {
                     {storageOptions.find(opt => opt.id === tempStorageType)?.name}
                   </p>
                 </Card>
+
+                {tempStorageType === 'filesystem' && (
+                  <Card className="p-4">
+                    <h4 className="font-semibold text-foreground mb-2">Pasta</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedDirectory ? selectedDirectory.name : 'Nenhuma pasta selecionada'}
+                    </p>
+                  </Card>
+                )}
 
                 <Card className="p-4">
                   <h4 className="font-semibold text-foreground mb-2">Tema</h4>
@@ -338,6 +479,15 @@ export const SetupModal = ({ isOpen, onClose }: SetupModalProps) => {
           </div>
           
           <div className="flex items-center space-x-3">
+            {step === 'directory' && (
+              <Button 
+                onClick={() => setStep('theme')}
+                disabled={!selectedDirectory}
+                className="min-w-[120px]"
+              >
+                Continuar
+              </Button>
+            )}
             {step === 'confirm' && (
               <Button 
                 onClick={handleComplete}

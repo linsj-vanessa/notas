@@ -22,6 +22,7 @@ Similar aos melhores editores modernos como **Notion**, **Obsidian** e **Typora*
 ### 📝 **Gestão de Notas**
 - ✅ Criar notas com título e conteúdo
 - ✅ **Foco Automático**: Cursor vai AUTOMATICAMENTE para o campo de texto ao criar nova nota - zero cliques extras!
+- ✅ **Redirecionamento Inteligente**: Ao criar nova nota do dashboard, redireciona automaticamente para o editor
 - ✅ Editar notas em tempo real
 - ✅ Salvar automático (2 segundos de inatividade)
 - ✅ **Sistema de Lixeira**: Notas deletadas vão para lixeira ao invés de exclusão permanente
@@ -133,6 +134,7 @@ Similar aos melhores editores modernos como **Notion**, **Obsidian** e **Typora*
 - Clique no botão "Nova Nota" no cabeçalho
 - A nota será criada automaticamente e aberta para edição
 - **Foco Automático**: O cursor vai direto para o campo de texto - você pode começar a digitar imediatamente
+- **Redirecionamento Automático**: Se estiver no dashboard, será redirecionado automaticamente para o editor
 - Funciona tanto no modo normal quanto no modo foco
 
 ### 2. **Editar Notas**

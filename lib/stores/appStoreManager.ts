@@ -21,7 +21,7 @@ interface AppStoreManager {
   getIsLoading: () => boolean;
   
   // Gerenciamento
-  setStorageType: (type: StorageType) => void;
+  setStorageType: (type: StorageType) => Promise<void>;
   initialize: () => void;
 }
 
@@ -32,12 +32,26 @@ export const useAppStoreManager = create<AppStoreManager>((set, get) => ({
   loadNotes: async () => {
     const { currentStorageType } = get();
     
-    if (currentStorageType === 'indexeddb') {
-      const { loadNotes } = useNotesStore.getState();
-      await loadNotes();
-    } else if (currentStorageType === 'filesystem') {
-      const { loadNotesFromFiles } = useFileNotesStore.getState();
-      await loadNotesFromFiles();
+    try {
+      if (currentStorageType === 'indexeddb') {
+        const { loadNotes } = useNotesStore.getState();
+        await loadNotes();
+      } else if (currentStorageType === 'filesystem') {
+        const { directories, loadNotesFromFiles, initializeFileSystem } = useFileNotesStore.getState();
+        
+        // Verificar se os diretórios estão inicializados
+        if (!directories.notes || !directories.trash) {
+          console.log('🔧 Diretórios não inicializados, tentando inicializar...');
+          await initializeFileSystem();
+        }
+        
+        await loadNotesFromFiles();
+      } else {
+        console.warn('Storage type não configurado ainda');
+      }
+    } catch (error) {
+      console.error('Erro ao carregar notas:', error);
+      throw error;
     }
   },
   
@@ -139,8 +153,28 @@ export const useAppStoreManager = create<AppStoreManager>((set, get) => ({
     return false;
   },
   
-  setStorageType: (type: StorageType) => {
-    set({ currentStorageType: type, isReady: true });
+  setStorageType: async (type: StorageType) => {
+    set({ currentStorageType: type });
+    
+    // Se for sistema de arquivos, inicializar automaticamente
+    if (type === 'filesystem') {
+      try {
+        const { directoryHandle, initializeFileSystem } = useFileNotesStore.getState();
+        
+        // Se já tem um diretório selecionado, inicializar
+        if (directoryHandle) {
+          console.log('🔧 Inicializando sistema de arquivos...');
+          await initializeFileSystem();
+        } else {
+          console.log('⚠️ Sistema de arquivos configurado, mas diretório não selecionado ainda');
+        }
+      } catch (error) {
+        console.error('Erro ao inicializar sistema de arquivos:', error);
+        // Não falhar aqui, deixar o usuário tentar novamente
+      }
+    }
+    
+    set({ isReady: true });
   },
   
   initialize: () => {

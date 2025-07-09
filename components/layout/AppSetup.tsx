@@ -17,28 +17,40 @@ export const AppSetup = ({ children }: AppSetupProps) => {
   
   // Aplicar configurações quando o setup for completado
   useEffect(() => {
-    const handleSetupCompleted = (event: CustomEvent<SetupConfiguration>) => {
-      const config = event.detail;
+    const handleSetupCompleted = async (event: Event) => {
+      const customEvent = event as CustomEvent<SetupConfiguration>;
+      const config = customEvent.detail;
       
-      // Aplicar tema selecionado
-      setTheme(config.selectedTheme);
-      
-      // Configurar o armazenamento baseado na escolha
-      setStorageType(config.storageType);
-      
-      // Carregar notas após configurar o tipo de armazenamento
-      loadNotes().catch(console.error);
-      
-      console.log('✅ Configuração aplicada:', config);
+      try {
+        // Aplicar tema selecionado
+        setTheme(config.selectedTheme);
+        
+        // Configurar o armazenamento baseado na escolha (agora é assíncrono)
+        console.log('🔧 Configurando tipo de armazenamento:', config.storageType);
+        await setStorageType(config.storageType);
+        
+        // Carregar notas após configurar o tipo de armazenamento
+        console.log('📁 Carregando notas...');
+        await loadNotes();
+        
+        console.log('✅ Configuração aplicada com sucesso:', config);
+      } catch (error) {
+        console.error('❌ Erro ao aplicar configuração:', error);
+        
+        // Se for erro de sistema de arquivos, mostrar mensagem mais amigável
+        if (error instanceof Error && error.message.includes('diretório')) {
+          console.error('Para usar o sistema de arquivos, você precisa selecionar uma pasta no modal de configuração.');
+        }
+      }
     };
 
     // Escutar evento de setup completado
-    window.addEventListener('setup-completed', handleSetupCompleted as EventListener);
+    window.addEventListener('setup-completed', handleSetupCompleted);
     
     return () => {
-      window.removeEventListener('setup-completed', handleSetupCompleted as EventListener);
+      window.removeEventListener('setup-completed', handleSetupCompleted);
     };
-  }, [setTheme]);
+  }, [setTheme, setStorageType, loadNotes]);
 
   // Inicializar setup ao montar o componente
   useEffect(() => {
