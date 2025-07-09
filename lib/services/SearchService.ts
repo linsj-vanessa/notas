@@ -1,5 +1,5 @@
 import { Note } from '@/types/note';
-import { SearchOptions, ServiceSearchResult } from '@/types/service.types';
+import { SearchOptions, SearchResult } from '@/types/service.types';
 
 export class SearchService {
   private static instance: SearchService;
@@ -14,7 +14,7 @@ export class SearchService {
   /**
    * Busca avançada em notas
    */
-  async search(notes: Note[], options: SearchOptions): Promise<ServiceSearchResult[]> {
+  async search(notes: Note[], options: SearchOptions): Promise<SearchResult[]> {
     const { query, fields = ['title', 'content', 'tags'], fuzzy = false, maxResults = 50, minScore = 0.1 } = options;
     
     if (!query.trim()) {
@@ -22,7 +22,7 @@ export class SearchService {
     }
 
     const searchTerms = query.toLowerCase().split(' ').filter(term => term.length > 0);
-    const results: ServiceSearchResult[] = [];
+    const results: SearchResult[] = [];
 
     for (const note of notes) {
       if (note.isDeleted) continue;
@@ -148,7 +148,7 @@ export class SearchService {
     return highlightedText;
   }
 
-  private scoreNote(note: Note, searchTerms: string[], fields: string[], fuzzy: boolean): ServiceSearchResult {
+  private scoreNote(note: Note, searchTerms: string[], fields: string[], fuzzy: boolean): SearchResult {
     let score = 0;
     const matchedFields: string[] = [];
     const highlights: { [field: string]: string } = {};

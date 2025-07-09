@@ -5,6 +5,13 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.1] - 2025-01-15
+
+### 🔧 **Correção de Navegação**
+- **fix: Redirecionamento automático ao criar nova nota**: Implementado redirecionamento para a página do editor quando uma nova nota é criada a partir do dashboard
+- **Navegação melhorada**: Seleção de notas também redireciona automaticamente para o editor quando necessário
+- **UX aprimorada**: Usuário agora é direcionado diretamente para escrever após criar uma nova nota
+
 ## [4.0.0] - 2025-01-15
 
 ### 🚀 Sistema de Salvamento Local tipo Obsidian (MEGA UPDATE)

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useNotesStore } from '@/lib/stores';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import { TrashView } from '@/components/ui/trash-view';
@@ -17,10 +17,11 @@ interface AppLayoutProps {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const { loadNotes } = useNotesStore();
   
   const { 
-    handleCreateNote, 
+    handleCreateNote: createNoteHook, 
     handleSelectNote, 
     handleDeleteNote: deleteNoteHook,
     getTextFromHtml 
@@ -48,6 +49,19 @@ export default function AppLayout({ children }: AppLayoutProps) {
   useEffect(() => {
     loadNotes();
   }, [loadNotes]);
+
+  // Função para criar nova nota e redirecionar
+  const handleCreateNote = async () => {
+    try {
+      await createNoteHook();
+      // Redirecionar para a página principal onde está o editor
+      if (pathname !== '/') {
+        router.push('/');
+      }
+    } catch (error) {
+      console.error('Error creating note:', error);
+    }
+  };
 
   const handleDeleteNote = (noteId: string, noteTitle: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -85,6 +99,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
     setShowTrash(false);
   };
 
+  // Função para selecionar nota e redirecionar se necessário
+  const handleSelectNoteWithNavigation = (note: Note) => {
+    handleSelectNote(note);
+    // Se não estiver na página principal, redirecionar
+    if (pathname !== '/') {
+      router.push('/');
+    }
+  };
+
   return (
     <div className="h-screen flex flex-col">
       <AppHeader onCreateNote={handleCreateNote} />
@@ -95,7 +118,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           trashCount={trashCount}
           onNavigateToTrash={handleNavigateToTrash}
           onNavigateToNotes={handleNavigateToNotes}
-          onSelectNote={handleSelectNote}
+          onSelectNote={handleSelectNoteWithNavigation}
           onDeleteNote={handleDeleteNote}
           getTextFromHtml={getTextFromHtml}
         />

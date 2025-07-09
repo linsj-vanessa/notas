@@ -7,6 +7,13 @@ import {
   FileMetadata
 } from './types';
 
+// Extensão de tipos para File System Access API
+declare global {
+  interface FileSystemDirectoryHandle {
+    entries(): AsyncIterable<[string, FileSystemHandle]>;
+  }
+}
+
 // Configuração padrão
 const DEFAULT_CONFIG: FileSystemConfig = {
   allowedFileTypes: ['.md', '.txt'],
@@ -188,7 +195,7 @@ export class FileSystemService implements IFileSystemService {
       
       for await (const [name, handle] of directory.entries()) {
         if (handle.kind === 'file') {
-          files.push(handle);
+          files.push(handle as FileSystemFileHandle);
         }
       }
       

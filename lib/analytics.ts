@@ -2,9 +2,31 @@ import { Note } from '@/types/note';
 import { WritingSession, ProductivityMetrics, HeatmapData, TextInsights, Achievement, DashboardData } from '@/types/analytics';
 import { calculateTextStats } from '@/lib/text-stats';
 
+// 🚀 CACHE INTERFACE
+interface CacheEntry {
+  notesHash: string;
+  dashboardData: DashboardData;
+  sessions: WritingSession[];
+  metrics: ProductivityMetrics;
+  insights: TextInsights;
+  timestamp: number;
+}
+
+interface NoteStatsCache {
+  [noteId: string]: {
+    hash: string;
+    stats: ReturnType<typeof calculateTextStats>;
+  };
+}
+
 export class AnalyticsService {
   private static instance: AnalyticsService;
-  private dailyGoal: number = 500; // Meta padrão de 500 palavras por dia
+  private dailyGoal: number = 500;
+  
+  // 🚀 SISTEMA DE CACHE
+  private cache: CacheEntry | null = null;
+  private noteStatsCache: NoteStatsCache = {};
+  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutos
 
   static getInstance(): AnalyticsService {
     if (!AnalyticsService.instance) {
@@ -15,18 +37,65 @@ export class AnalyticsService {
 
   setDailyGoal(goal: number): void {
     this.dailyGoal = goal;
+    // Invalidar cache quando meta muda
+    this.cache = null;
   }
 
   getDailyGoal(): number {
     return this.dailyGoal;
   }
 
-  // Gerar sessões de escrita por dia
-  generateWritingSessions(notes: Note[]): WritingSession[] {
-    const sessionMap = new Map<string, WritingSession>();
+  // 🚀 CACHE HELPERS
+  private generateNotesHash(notes: Note[]): string {
+    // Hash baseado em id, conteúdo e data de atualização
+    return notes
+      .filter(note => !note.isDeleted)
+      .map(note => `${note.id}-${note.updatedAt.getTime()}-${note.content.length}`)
+      .sort()
+      .join('|');
+  }
 
-    notes.forEach(note => {
-      if (note.isDeleted) return;
+  private getCachedNoteStats(note: Note): ReturnType<typeof calculateTextStats> {
+    const noteHash = `${note.id}-${note.updatedAt.getTime()}-${note.content.length}`;
+    
+    if (this.noteStatsCache[note.id]?.hash === noteHash) {
+      return this.noteStatsCache[note.id].stats;
+    }
+    
+    // Calcular e cachear
+    const stats = calculateTextStats(note.content);
+    this.noteStatsCache[note.id] = { hash: noteHash, stats };
+    
+    return stats;
+  }
+
+  private isCacheValid(notesHash: string): boolean {
+    if (!this.cache) return false;
+    
+    const isNotStale = (Date.now() - this.cache.timestamp) < this.CACHE_TTL;
+    const isHashMatch = this.cache.notesHash === notesHash;
+    
+    return isNotStale && isHashMatch;
+  }
+
+  // 🚀 GENERATEWRITINGSESSIONS OTIMIZADO
+  generateWritingSessions(notes: Note[]): WritingSession[] {
+    const notesHash = this.generateNotesHash(notes);
+    
+    // Verificar se já temos sessions no cache
+    if (this.cache?.notesHash === notesHash && this.cache.sessions) {
+      return this.cache.sessions;
+    }
+
+    console.log('📊 Gerando sessions...');
+    const startTime = performance.now();
+    
+    const sessionMap = new Map<string, WritingSession>();
+    const activeNotes = notes.filter(note => !note.isDeleted);
+
+    activeNotes.forEach(note => {
+      // Usar cache de stats
+      const stats = this.getCachedNoteStats(note);
 
       // Processar criação da nota
       const createdDate = this.formatDate(note.createdAt);
@@ -41,7 +110,7 @@ export class AnalyticsService {
 
       const createdSession = sessionMap.get(createdDate)!;
       createdSession.notesCreated++;
-      createdSession.wordCount += calculateTextStats(note.content).words;
+      createdSession.wordCount += stats.words;
 
       // Processar atualização da nota (se diferente da criação)
       const updatedDate = this.formatDate(note.updatedAt);
@@ -59,20 +128,40 @@ export class AnalyticsService {
         updatedSession.notesUpdated++;
         // Adicionar palavras apenas se for uma atualização significativa
         if (note.updatedAt.getTime() - note.createdAt.getTime() > 60000) { // 1 minuto
-          updatedSession.wordCount += calculateTextStats(note.content).words;
+          updatedSession.wordCount += stats.words;
         }
       }
     });
 
-    return Array.from(sessionMap.values()).sort((a, b) => b.date.localeCompare(a.date));
+    const sessions = Array.from(sessionMap.values()).sort((a, b) => b.date.localeCompare(a.date));
+    
+    const endTime = performance.now();
+    console.log(`✅ Sessions geradas em ${Math.round(endTime - startTime)}ms`);
+    
+    return sessions;
   }
 
-  // Calcular métricas de produtividade
+  // 🚀 CALCULAR MÉTRICAS OTIMIZADO
   calculateProductivityMetrics(notes: Note[]): ProductivityMetrics {
+    const notesHash = this.generateNotesHash(notes);
+    
+    // Verificar se já temos métricas no cache
+    if (this.cache?.notesHash === notesHash && this.cache.metrics) {
+      return this.cache.metrics;
+    }
+
+    console.log('📊 Calculando métricas...');
+    const startTime = performance.now();
+    
     const sessions = this.generateWritingSessions(notes);
     const activeNotes = notes.filter(note => !note.isDeleted);
     
-    const totalWords = activeNotes.reduce((sum, note) => sum + calculateTextStats(note.content).words, 0);
+    // Usar cache de stats para evitar recalcular
+    const totalWords = activeNotes.reduce((sum, note) => {
+      const stats = this.getCachedNoteStats(note);
+      return sum + stats.words;
+    }, 0);
+    
     const totalNotes = activeNotes.length;
     const activeDays = sessions.length;
     
@@ -97,7 +186,7 @@ export class AnalyticsService {
     const { thisWeekWords, lastWeekWords, weeklyChange } = this.calculateWeeklyChange(sessions);
     const { thisMonthWords, lastMonthWords, monthlyChange } = this.calculateMonthlyChange(sessions);
 
-    return {
+    const metrics: ProductivityMetrics = {
       totalWords,
       totalNotes,
       activeDays,
@@ -114,6 +203,11 @@ export class AnalyticsService {
       lastMonthWords,
       monthlyChange,
     };
+
+    const endTime = performance.now();
+    console.log(`✅ Métricas calculadas em ${Math.round(endTime - startTime)}ms`);
+
+    return metrics;
   }
 
   // Calcular streaks de escrita
@@ -236,17 +330,37 @@ export class AnalyticsService {
     return heatmapData;
   }
 
-  // Calcular insights de texto
+  // 🚀 CALCULAR INSIGHTS OTIMIZADO
   calculateTextInsights(notes: Note[]): TextInsights {
-    const activeNotes = notes.filter(note => !note.isDeleted);
-    const allText = activeNotes.map(note => note.content).join(' ');
+    const notesHash = this.generateNotesHash(notes);
     
-    // Palavras mais usadas
+    // Verificar se já temos insights no cache
+    if (this.cache?.notesHash === notesHash && this.cache.insights) {
+      return this.cache.insights;
+    }
+
+    console.log('📊 Calculando insights de texto...');
+    const startTime = performance.now();
+    
+    const activeNotes = notes.filter(note => !note.isDeleted);
+    
+    // 🚀 OTIMIZAÇÃO: Combinar textos usando stats cacheados
+    let allText = '';
+    let totalWords = 0;
+    let totalParagraphs = 0;
+    
+    activeNotes.forEach(note => {
+      allText += note.content + ' ';
+      const stats = this.getCachedNoteStats(note);
+      totalWords += stats.words;
+      totalParagraphs += stats.paragraphs;
+    });
+    
+    // Palavras mais usadas - otimizado
     const words = allText.toLowerCase()
-      .replace(/[^\w\s]/g, '')
+      .replace(/[^\w\sáàãâéêíóôõúç]/g, '') // Incluir caracteres portugueses
       .split(/\s+/)
-      .filter(word => word.length > 3) // Ignorar palavras muito curtas
-      .filter(word => !this.isStopWord(word));
+      .filter(word => word.length > 3 && !this.isStopWord(word));
     
     const wordCount = new Map<string, number>();
     words.forEach(word => {
@@ -258,18 +372,22 @@ export class AnalyticsService {
       .slice(0, 10)
       .map(([word, count]) => ({ word, count }));
     
-    // Calcular estatísticas de texto
-    const stats = calculateTextStats(allText);
-    const avgWordsPerParagraph = stats.paragraphs > 0 ? stats.words / stats.paragraphs : 0;
+    // Usar dados pré-calculados
+    const avgWordsPerParagraph = totalParagraphs > 0 ? totalWords / totalParagraphs : 0;
     const avgSentenceLength = this.calculateAverageSentenceLength(allText);
     
-    return {
+    const insights: TextInsights = {
       mostUsedWords,
       avgWordsPerParagraph,
       avgSentenceLength,
       readingLevel: this.determineReadingLevel(avgSentenceLength),
       predominantStyle: this.determinePredominantStyle(allText),
     };
+
+    const endTime = performance.now();
+    console.log(`✅ Insights calculados em ${Math.round(endTime - startTime)}ms`);
+    
+    return insights;
   }
 
   // Gerar conquistas
@@ -452,8 +570,21 @@ export class AnalyticsService {
     return Math.min(consecutiveDays, 7);
   }
 
-  // Gerar todos os dados do dashboard
+  // 🚀 GERAR DADOS DO DASHBOARD - SUPER OTIMIZADO
   generateDashboardData(notes: Note[]): DashboardData {
+    const notesHash = this.generateNotesHash(notes);
+
+    // Verificar se já temos dados no cache
+    if (this.isCacheValid(notesHash)) {
+      console.log('🚀 Usando dados do dashboard do cache!');
+      return this.cache!.dashboardData;
+    }
+
+    console.log('📊 Gerando dados do dashboard (primeira vez ou cache inválido)...');
+    const startTime = performance.now();
+
+    // 🚀 Como sessions, metrics e insights agora têm cache individual,
+    // eles serão bem mais rápidos na segunda chamada
     const sessions = this.generateWritingSessions(notes);
     const metrics = this.calculateProductivityMetrics(notes);
     const heatmapData = this.generateHeatmapData(sessions);
@@ -461,13 +592,35 @@ export class AnalyticsService {
     const achievements = this.generateAchievements(notes, metrics);
     const recentActivity = sessions.slice(0, 7); // Últimos 7 dias
 
-    return {
+    const dashboardData: DashboardData = {
       metrics,
       heatmapData,
       insights,
       achievements,
       recentActivity,
     };
+
+    // Atualizar cache completo
+    this.cache = {
+      notesHash,
+      dashboardData,
+      sessions,
+      metrics,
+      insights,
+      timestamp: Date.now(),
+    };
+
+    const endTime = performance.now();
+    console.log(`✅ Dashboard completo gerado em ${Math.round(endTime - startTime)}ms`);
+
+    return dashboardData;
+  }
+
+  // 🚀 MÉTODO PARA LIMPAR CACHE (útil para desenvolvimento)
+  clearCache(): void {
+    this.cache = null;
+    this.noteStatsCache = {};
+    console.log('🗑️ Cache limpo');
   }
 
   // Funções auxiliares
@@ -522,4 +675,9 @@ export class AnalyticsService {
   }
 }
 
-export const analyticsService = AnalyticsService.getInstance(); 
+export const analyticsService = AnalyticsService.getInstance();
+
+// 🚀 Para desenvolvimento - limpar cache quando necessário
+if (typeof window !== 'undefined') {
+  (window as any).clearAnalyticsCache = () => analyticsService.clearCache();
+} 

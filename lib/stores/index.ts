@@ -2,6 +2,9 @@
 export { useNotesStore } from './notesStore';
 export { useTrashStore } from './trashStore';
 export { useUIStore } from './uiStore';
+export { useSetupStore, type StorageType, type SetupConfiguration } from './setupStore';
+export { useFileNotesStore } from './fileNotesStore';
+export { useAppStoreManager } from './appStoreManager';
 
 // Import stores for combined hook
 import { useNotesStore } from './notesStore';

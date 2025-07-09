@@ -11,13 +11,14 @@ import { formatNumber } from '@/lib/text-stats';
 import ExportModal from './export-modal';
 import NotificationSettingsModal from './notification-settings-modal';
 import BackupModal from './backup-modal';
+import { PerformanceDebug } from './performance-debug';
 
 interface DashboardProps {
   className?: string;
 }
 
 export function Dashboard({ className = '' }: DashboardProps) {
-  const { notes, loadNotes } = useNotesStore();
+  const { notes, loadNotes, isLoading: notesLoading } = useNotesStore();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState<'week' | 'month' | 'year'>('week');
@@ -27,21 +28,49 @@ export function Dashboard({ className = '' }: DashboardProps) {
   const [showBackup, setShowBackup] = useState(false);
   const [dailyGoal, setDailyGoal] = useState(500);
 
+  // 🚀 OTIMIZAÇÃO 1: Só carregar notas se necessário
   useEffect(() => {
-    loadNotes();
-  }, [loadNotes]);
+    // Só carrega notas se não tiver nenhuma e não estiver carregando
+    if (notes.length === 0 && !notesLoading) {
+      loadNotes();
+    }
+  }, [notes.length, notesLoading, loadNotes]);
+
+  // 🚀 OTIMIZAÇÃO 2: Memoização mais inteligente com hash das notas
+  const notesHash = useMemo(() => {
+    // Criar um hash simples baseado no conteúdo das notas para evitar recálculos desnecessários
+    return notes.map(note => `${note.id}-${note.updatedAt.getTime()}`).join('|');
+  }, [notes]);
 
   const memoizedDashboardData = useMemo(() => {
     if (notes.length > 0) {
-      return analyticsService.generateDashboardData(notes);
+      console.log('🔄 Recalculando dashboard data...');
+      const startTime = performance.now();
+      
+      const data = analyticsService.generateDashboardData(notes);
+      
+      const endTime = performance.now();
+      console.log(`✅ Dashboard calculado em ${Math.round(endTime - startTime)}ms`);
+      
+      return data;
     }
     return null;
-  }, [notes]);
+  }, [notesHash]); // Usar hash em vez de notes diretamente
 
+  // 🚀 OTIMIZAÇÃO 3: Loading state mais inteligente
   useEffect(() => {
-    setDashboardData(memoizedDashboardData);
-    setIsLoading(false);
-  }, [memoizedDashboardData]);
+    if (notesLoading) {
+      setIsLoading(true);
+    } else {
+      // Pequeno delay para evitar flicker
+      const timer = setTimeout(() => {
+        setDashboardData(memoizedDashboardData);
+        setIsLoading(false);
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [memoizedDashboardData, notesLoading]);
 
   const handlePeriodChange = useCallback((period: 'week' | 'month' | 'year') => {
     setSelectedPeriod(period);
@@ -51,15 +80,40 @@ export function Dashboard({ className = '' }: DashboardProps) {
     setDailyGoal(goal);
   }, []);
 
-  if (isLoading) {
+  // 🚀 OTIMIZAÇÃO 4: Loading state melhorado
+  if (isLoading || notesLoading) {
     return (
-      <div className={`flex items-center justify-center h-64 ${className}`}>
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      <div className={`space-y-6 ${className}`}>
+        {/* Header skeleton */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="h-8 w-64 bg-muted animate-pulse rounded"></div>
+            <div className="h-4 w-48 bg-muted animate-pulse rounded mt-2"></div>
+          </div>
+          <div className="flex gap-2">
+            <div className="h-9 w-20 bg-muted animate-pulse rounded"></div>
+            <div className="h-9 w-24 bg-muted animate-pulse rounded"></div>
+            <div className="h-9 w-20 bg-muted animate-pulse rounded"></div>
+          </div>
+        </div>
+        
+        {/* Cards skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="h-24 bg-muted animate-pulse rounded-lg"></div>
+          ))}
+        </div>
+        
+        {/* Charts skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="h-64 bg-muted animate-pulse rounded-lg"></div>
+          <div className="h-64 bg-muted animate-pulse rounded-lg"></div>
+        </div>
       </div>
     );
   }
 
-  if (!dashboardData) {
+  if (!dashboardData || notes.length === 0) {
     return (
       <div className={`text-center py-12 ${className}`}>
         <div className="text-6xl mb-4">📊</div>
@@ -299,6 +353,9 @@ export function Dashboard({ className = '' }: DashboardProps) {
           onClose={() => setShowBackup(false)}
         />
       )}
+
+      {/* Debug de Performance */}
+      <PerformanceDebug />
     </div>
   );
 }
