@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useNotesStore } from '@/lib/store';
+import React, { useState, useEffect, memo, useMemo, useCallback } from 'react';
+import { useNotesStore } from '@/lib/stores';
 import { analyticsService } from '@/lib/analytics';
-import { DashboardData, ProductivityMetrics } from '@/types/note';
+import { DashboardData, ProductivityMetrics } from '@/types/analytics';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,15 +31,25 @@ export function Dashboard({ className = '' }: DashboardProps) {
     loadNotes();
   }, [loadNotes]);
 
-  useEffect(() => {
+  const memoizedDashboardData = useMemo(() => {
     if (notes.length > 0) {
-      const data = analyticsService.generateDashboardData(notes);
-      setDashboardData(data);
-      setIsLoading(false);
-    } else {
-      setIsLoading(false);
+      return analyticsService.generateDashboardData(notes);
     }
+    return null;
   }, [notes]);
+
+  useEffect(() => {
+    setDashboardData(memoizedDashboardData);
+    setIsLoading(false);
+  }, [memoizedDashboardData]);
+
+  const handlePeriodChange = useCallback((period: 'week' | 'month' | 'year') => {
+    setSelectedPeriod(period);
+  }, []);
+
+  const handleGoalChange = useCallback((goal: number) => {
+    setDailyGoal(goal);
+  }, []);
 
   if (isLoading) {
     return (
@@ -108,7 +118,7 @@ export function Dashboard({ className = '' }: DashboardProps) {
           {/* Filtros de período */}
           <div className="flex gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
             <button
-              onClick={() => setSelectedPeriod('week')}
+              onClick={() => handlePeriodChange('week')}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 selectedPeriod === 'week'
                   ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
@@ -118,7 +128,7 @@ export function Dashboard({ className = '' }: DashboardProps) {
               Semana
             </button>
             <button
-              onClick={() => setSelectedPeriod('month')}
+              onClick={() => handlePeriodChange('month')}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 selectedPeriod === 'month'
                   ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
@@ -128,7 +138,7 @@ export function Dashboard({ className = '' }: DashboardProps) {
               Mês
             </button>
             <button
-              onClick={() => setSelectedPeriod('year')}
+              onClick={() => handlePeriodChange('year')}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 selectedPeriod === 'year'
                   ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'

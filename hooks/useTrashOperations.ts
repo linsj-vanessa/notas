@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useNotesStore } from '@/lib/store';
+import { useTrashStore } from '@/lib/stores';
 import { useCleanupScheduler } from '@/lib/cleanup-scheduler';
 
 export const useTrashOperations = () => {
@@ -9,7 +9,7 @@ export const useTrashOperations = () => {
     permanentDelete, 
     getTrashNotes, 
     emptyTrash 
-  } = useNotesStore();
+  } = useTrashStore();
 
   const { startCleanup, stopCleanup, runManualCleanup } = useCleanupScheduler();
 

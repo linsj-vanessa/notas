@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { X, Download, FileText, Table, Database, Calendar } from 'lucide-react';
-import { DashboardData } from '@/types/note';
+import { DashboardData } from '@/types/analytics';
 import { exportService } from '@/lib/export-service';
 
 interface ExportModalProps {

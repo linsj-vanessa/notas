@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Search, Calendar, Tag, FileText, Filter, SortAsc, SortDesc } from 'lucide-react';
 import { Note } from '@/types/note';
-import { useNotesStore } from '@/lib/store';
+import { useNotesStore } from '@/lib/stores';
 
 interface AdvancedSearchModalProps {
   isOpen: boolean;

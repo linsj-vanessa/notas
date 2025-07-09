@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { useNotesStore } from '@/lib/store';
+import { useNotesStore } from '@/lib/stores';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import { TrashView } from '@/components/ui/trash-view';
 import { useNoteOperations } from '@/hooks/useNoteOperations';

@@ -1,4 +1,4 @@
-import { DashboardData, ProductivityMetrics, WritingSession } from '@/types/note';
+import { DashboardData, ProductivityMetrics, WritingSession } from '@/types/analytics';
 import { formatNumber } from '@/lib/text-stats';
 
 export class ExportService {

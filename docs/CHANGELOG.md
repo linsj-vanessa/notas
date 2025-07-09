@@ -5,6 +5,78 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0] - 2025-01-15
+
+### 🚀 Sistema de Salvamento Local tipo Obsidian (MEGA UPDATE)
+
+#### 📁 **Infraestrutura de Arquivos Locais**
+- **File System Access API**: Acesso nativo e direto ao sistema de arquivos
+- **Estrutura Organizada**: Notas/, Lixeira/, .notas-app/ com metadados
+- **Formato Markdown**: Conversão automática JSON ↔ Markdown com frontmatter YAML
+- **Compatibilidade Externa**: Funciona perfeitamente com Obsidian, VS Code, etc.
+- **Detecção Automática**: Verifica suporte do navegador e oferece fallbacks
+
+#### 🔄 **Migração Completa e Segura**
+- **Assistente de Migração**: Interface passo-a-passo para migrar do IndexedDB
+- **Backup Automático**: Cria backup completo antes de qualquer migração
+- **Validação de Integridade**: Verifica dados migrados para garantir 100% de precisão
+- **Progresso Visual**: Barra de progresso com etapas detalhadas
+- **Teste de Migração**: Opção de testar com poucas notas antes da migração completa
+
+#### 🎯 **Novo Store de Arquivos**
+- **Operações CRUD**: Criar, ler, atualizar, deletar notas diretamente em arquivos
+- **Sincronização Bidirecional**: Arquivos locais ↔ estado da aplicação
+- **Sistema de Lixeira**: Gerenciamento completo da lixeira com arquivos
+- **Busca Otimizada**: Filtros por título, conteúdo, tags com performance
+- **Cache Inteligente**: Minimiza operações de arquivo desnecessárias
+
+#### 🛠️ **Formato de Arquivo Markdown**
+```markdown
+---
+id: "uuid-da-nota"
+title: "Título da Nota"
+tags: ["tag1", "tag2"]
+created: "2024-01-15T10:30:00.000Z"
+updated: "2024-01-15T12:45:00.000Z"
+---
+
+# Título da Nota
+
+Conteúdo da nota em **markdown**...
+```
+
+#### 🔧 **Componentes de Desenvolvimento**
+- **Teste de Sistema**: `/filesystem-test` - Teste completo do File System Access API
+- **Assistente de Migração**: `/migration` - Interface completa para migração
+- **Teste de Store**: `/file-store-test` - Validação do novo store de arquivos
+- **Documentação Completa**: Relatórios de progresso e guias técnicos
+
+#### 📊 **Tecnologias Implementadas**
+- **File System Access API**: Acesso direto aos arquivos (Chrome/Edge nativo)
+- **Zustand**: Gerenciamento de estado especializado para arquivos
+- **TypeScript**: Tipagem completa para todas as operações
+- **Markdown + YAML**: Formato padrão da indústria para notas
+- **Backup Manager**: Sistema robusto de backup e restauração
+
+#### 🌟 **Compatibilidade**
+- **Chrome/Edge**: Suporte completo nativo
+- **Firefox**: Funciona com adaptações
+- **Safari**: Fallback para download/upload
+- **Obsidian**: Compatibilidade 100% com arquivos .md
+- **VS Code**: Abertura direta dos arquivos no editor
+
+### 🔄 **Preparação para Futuro Online**
+- **Arquitetura Modular**: Preparada para adicionar sincronização online
+- **Abstração de Storage**: Base sólida para múltiplos tipos de armazenamento
+- **Sistema de Conflitos**: Estrutura pronta para resolução de conflitos
+- **API Ready**: Arquitetura preparada para integração com APIs
+
+### 📈 **Métricas de Sucesso**
+- **Salvamento Direto**: ✅ Notas salvas diretamente no sistema de arquivos
+- **Compatibilidade Externa**: ✅ Funciona com Obsidian e outros editores
+- **Migração Segura**: ✅ Zero perda de dados durante migração
+- **Interface Intuitiva**: ✅ Assistente passo-a-passo para usuários
+
 ## [3.1.0] - 2025-01-13
 
 ### 🔧 Plano de Refatoração Estruturado

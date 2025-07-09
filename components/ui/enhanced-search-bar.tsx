@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, Filter, X } from 'lucide-react';
 import { Note } from '@/types/note';
-import { useNotesStore } from '@/lib/store';
+import { useNotesStore, useUIStore } from '@/lib/stores';
 import AdvancedSearchModal from './advanced-search-modal';
 
 interface EnhancedSearchBarProps {
@@ -17,7 +17,8 @@ export default function EnhancedSearchBar({
   placeholder = "Buscar notas...",
   className = ""
 }: EnhancedSearchBarProps) {
-  const { notes, searchTerm, setSearchTerm } = useNotesStore();
+  const { notes } = useNotesStore();
+  const { searchTerm, setSearchTerm } = useUIStore();
   const [isAdvancedSearchOpen, setIsAdvancedSearchOpen] = useState(false);
   const [quickResults, setQuickResults] = useState<Note[]>([]);
   const [showQuickResults, setShowQuickResults] = useState(false);

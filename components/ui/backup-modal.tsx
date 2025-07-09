@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Download, Upload, HardDrive, Clock, Trash2, RotateCcw, Shield, AlertTriangle } from 'lucide-react';
 import { useBackup, BackupData } from '@/lib/backup-service';
-import { useNotesStore } from '@/lib/store';
+import { useNotesStore } from '@/lib/stores';
 
 interface BackupModalProps {
   isOpen: boolean;

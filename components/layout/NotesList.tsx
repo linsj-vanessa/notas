@@ -1,8 +1,9 @@
 'use client';
 
+import React, { memo, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Clock, Trash2 } from 'lucide-react';
-import { useNotesStore } from '@/lib/store';
+import { useNotesStore, useUIStore } from '@/lib/stores';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Note } from '@/types/note';
@@ -15,7 +16,7 @@ interface NotesListProps {
   getTextFromHtml: (html: string) => string;
 }
 
-export default function NotesList({ 
+const NotesList = memo(function NotesList({ 
   showTrash, 
   pathname,
   onSelectNote,
@@ -24,12 +25,23 @@ export default function NotesList({
 }: NotesListProps) {
   const { 
     isLoading, 
-    searchTerm, 
-    currentNote, 
-    getFilteredNotes 
+    currentNote 
   } = useNotesStore();
 
-  const filteredNotes = getFilteredNotes();
+  const {
+    searchTerm,
+    getFilteredNotes
+  } = useUIStore();
+
+  const filteredNotes = useMemo(() => getFilteredNotes(), [getFilteredNotes]);
+
+  const handleNoteClick = useCallback((note: Note) => {
+    onSelectNote(note);
+  }, [onSelectNote]);
+
+  const handleDeleteClick = useCallback((noteId: string, noteTitle: string, e: React.MouseEvent) => {
+    onDeleteNote(noteId, noteTitle, e);
+  }, [onDeleteNote]);
 
   // Não mostrar lista se estiver na lixeira ou no dashboard
   if (showTrash || pathname !== '/') {
@@ -60,7 +72,7 @@ export default function NotesList({
                   ? 'bg-muted border-border'
                   : ''
               }`}
-              onClick={() => onSelectNote(note)}
+              onClick={() => handleNoteClick(note)}
             >
               <div className="flex items-start gap-3">
                 <FileText className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
@@ -87,7 +99,7 @@ export default function NotesList({
                   variant="ghost"
                   size="sm"
                   className="opacity-0 group-hover:opacity-100 transition-opacity absolute top-2 right-2 h-6 w-6 p-0 hover:bg-destructive hover:text-destructive-foreground"
-                  onClick={(e) => onDeleteNote(note.id, note.title, e)}
+                  onClick={(e) => handleDeleteClick(note.id, note.title, e)}
                   title="Apagar nota"
                 >
                   <Trash2 className="h-3 w-3" />
@@ -99,4 +111,6 @@ export default function NotesList({
       </div>
     </div>
   );
-} 
+});
+
+export default NotesList; 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
-import { useNotesStore } from '@/lib/store';
+import { useNotesStore, useUIStore, useTrashStore } from '@/lib/stores';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Save, Eye, Edit, Trash2, Maximize2, Minimize2 } from 'lucide-react';
@@ -14,11 +14,15 @@ export default function Home() {
   const { 
     currentNote, 
     updateNote, 
-    deleteNote, 
-    setCurrentNote, 
+    setCurrentNote 
+  } = useNotesStore();
+  
+  const { 
     isFocusMode, 
     setFocusMode 
-  } = useNotesStore();
+  } = useUIStore();
+  
+  const { deleteNote } = useTrashStore();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 

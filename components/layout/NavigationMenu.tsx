@@ -3,7 +3,7 @@
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { BarChart3, FileText, Trash2 } from 'lucide-react';
-import { useNotesStore } from '@/lib/store';
+import { useUIStore } from '@/lib/stores';
 
 interface NavigationMenuProps {
   showTrash: boolean;
@@ -20,7 +20,7 @@ export default function NavigationMenu({
 }: NavigationMenuProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { getFilteredNotes } = useNotesStore();
+  const { getFilteredNotes } = useUIStore();
   
   const filteredNotes = getFilteredNotes();
 

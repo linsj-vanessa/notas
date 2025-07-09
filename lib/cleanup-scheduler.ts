@@ -1,4 +1,4 @@
-import { useNotesStore } from '@/lib/store';
+import { useTrashStore } from '@/lib/stores';
 
 // Scheduler para limpeza automática
 class CleanupScheduler {
@@ -34,7 +34,7 @@ class CleanupScheduler {
 
   private async runCleanup() {
     try {
-      const { cleanupOldTrash } = useNotesStore.getState();
+      const { cleanupOldTrash } = useTrashStore.getState();
       await cleanupOldTrash();
       console.log('Limpeza automática da lixeira executada com sucesso');
     } catch (error) {

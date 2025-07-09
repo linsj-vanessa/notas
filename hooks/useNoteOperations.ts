@@ -1,14 +1,15 @@
 import { useState, useCallback } from 'react';
-import { useNotesStore } from '@/lib/store';
+import { useNotesStore, useTrashStore } from '@/lib/stores';
 import { Note } from '@/types/note';
 
 export const useNoteOperations = () => {
   const { 
     createNote, 
     updateNote, 
-    deleteNote, 
     setCurrentNote 
   } = useNotesStore();
+  
+  const { deleteNote } = useTrashStore();
 
   const [isCreating, setIsCreating] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);

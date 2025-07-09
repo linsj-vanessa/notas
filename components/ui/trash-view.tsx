@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Note } from '@/types/note';
-import { useNotesStore } from '@/lib/store';
+import { useTrashStore } from '@/lib/stores';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Trash2, RotateCcw, AlertTriangle } from 'lucide-react';
@@ -15,7 +15,7 @@ export function TrashView() {
   const [showPermanentDeleteModal, setShowPermanentDeleteModal] = useState(false);
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(null);
   
-  const { getTrashNotes, restoreFromTrash, permanentDelete, emptyTrash } = useNotesStore();
+  const { getTrashNotes, restoreFromTrash, permanentDelete, emptyTrash } = useTrashStore();
 
   const loadTrashNotes = async () => {
     setIsLoading(true);

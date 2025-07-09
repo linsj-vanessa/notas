@@ -4,14 +4,14 @@ import { Search, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import ThemeSelector from '@/components/ui/theme-selector';
-import { useNotesStore } from '@/lib/store';
+import { useUIStore } from '@/lib/stores';
 
 interface AppHeaderProps {
   onCreateNote: () => void;
 }
 
 export default function AppHeader({ onCreateNote }: AppHeaderProps) {
-  const { searchTerm, setSearchTerm } = useNotesStore();
+  const { searchTerm, setSearchTerm } = useUIStore();
 
   return (
     <header className="border-b border-border bg-background px-4 py-3 flex items-center justify-between">

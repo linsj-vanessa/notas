@@ -1,4 +1,5 @@
-import { Note, WritingSession, ProductivityMetrics, HeatmapData, TextInsights, Achievement, DashboardData } from '@/types/note';
+import { Note } from '@/types/note';
+import { WritingSession, ProductivityMetrics, HeatmapData, TextInsights, Achievement, DashboardData } from '@/types/analytics';
 import { calculateTextStats } from '@/lib/text-stats';
 
 export class AnalyticsService {
