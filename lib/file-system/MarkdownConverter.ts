@@ -18,6 +18,7 @@ export interface NoteFrontmatter {
 
 export class MarkdownConverter {
   private static instance: MarkdownConverter;
+  private debugMode = false;
 
   static getInstance(): MarkdownConverter {
     if (!MarkdownConverter.instance) {
@@ -27,33 +28,63 @@ export class MarkdownConverter {
   }
 
   /**
+   * Ativa/desativa modo de depuração
+   */
+  setDebugMode(enabled: boolean): void {
+    this.debugMode = enabled;
+  }
+
+  /**
+   * Log de depuração
+   */
+  private debugLog(step: string, data: any): void {
+    if (this.debugMode) {
+      console.log(`[MarkdownConverter] ${step}:`, data);
+    }
+  }
+
+  /**
    * Converte uma nota JSON para formato Markdown com frontmatter
    */
   toMarkdown(note: Note): string {
-    const frontmatter: NoteFrontmatter = {
-      id: note.id,
-      title: note.title,
-      tags: note.tags || [],
-      created: note.createdAt.toISOString(),
-      updated: note.updatedAt.toISOString(),
+    // Validar entrada e garantir tipos corretos
+    const safeNote = {
+      id: typeof note.id === 'string' ? note.id : crypto.randomUUID(),
+      title: typeof note.title === 'string' ? note.title : 'Sem título',
+      tags: Array.isArray(note.tags) ? note.tags.filter(tag => typeof tag === 'string') : [],
+      content: typeof note.content === 'string' ? note.content : '',
+      createdAt: note.createdAt instanceof Date ? note.createdAt : new Date(),
+      updatedAt: note.updatedAt instanceof Date ? note.updatedAt : new Date(),
+      isDeleted: Boolean(note.isDeleted),
+      deletedAt: note.deletedAt instanceof Date ? note.deletedAt : undefined,
     };
 
+    const frontmatter: NoteFrontmatter = {
+      id: safeNote.id,
+      title: safeNote.title, // Preservar título exatamente como está
+      tags: safeNote.tags,
+      created: safeNote.createdAt.toISOString(),
+      updated: safeNote.updatedAt.toISOString(),
+    };
+
+    this.debugLog('Frontmatter criado', frontmatter);
+
     // Adicionar campos da lixeira se necessário
-    if (note.isDeleted) {
+    if (safeNote.isDeleted) {
       frontmatter.isDeleted = true;
-      if (note.deletedAt) {
-        frontmatter.deletedAt = note.deletedAt.toISOString();
+      if (safeNote.deletedAt) {
+        frontmatter.deletedAt = safeNote.deletedAt.toISOString();
       }
     }
 
     const yamlFrontmatter = this.objectToYaml(frontmatter);
     
     // Garantir que o conteúdo comece com título se não tiver
-    let content = note.content || '';
-    if (content && note.title && !content.startsWith(`# ${note.title}`)) {
-      content = `# ${note.title}\n\n${content}`;
-    } else if (!content && note.title) {
-      content = `# ${note.title}\n\n`;
+    let content = safeNote.content || '';
+    if (content && safeNote.title && !content.startsWith(`# ${safeNote.title}`)) {
+      content = `# ${safeNote.title}\n\n${content}`;
+    } else if (!content && safeNote.title) {
+      content = `# ${safeNote.title}\n\n`;
     }
 
     return `---\n${yamlFrontmatter}---\n\n${content}`;
@@ -65,17 +96,63 @@ export class MarkdownConverter {
   fromMarkdown(markdownContent: string): Note {
     try {
       const parsed = this.parseMarkdown(markdownContent);
+      const { frontmatter, content } = parsed;
+
+      this.debugLog('Frontmatter extraído', frontmatter);
+
+      // Validar e converter campos obrigatórios com verificação de tipos
+      const id = typeof frontmatter.id === 'string' ? frontmatter.id : crypto.randomUUID();
       
-      return {
-        id: parsed.frontmatter.id,
-        title: parsed.frontmatter.title,
-        content: parsed.content,
-        tags: parsed.frontmatter.tags || [],
-        createdAt: new Date(parsed.frontmatter.created),
-        updatedAt: new Date(parsed.frontmatter.updated),
-        isDeleted: parsed.frontmatter.isDeleted || false,
-        deletedAt: parsed.frontmatter.deletedAt ? new Date(parsed.frontmatter.deletedAt) : undefined,
+      // CRÍTICO: Preservar título exatamente como está no frontmatter
+      let title = frontmatter.title;
+      if (typeof title !== 'string') {
+        title = 'Sem título';
+      }
+      // Não fazer trim() ou outras modificações que possam alterar o título
+      
+      this.debugLog('Título após validação', { original: frontmatter.title, processed: title });
+      const tags = Array.isArray(frontmatter.tags) ? frontmatter.tags.filter(tag => typeof tag === 'string') : [];
+      
+      // Converter datas com verificação robusta
+      let createdAt: Date;
+      let updatedAt: Date;
+      let deletedAt: Date | undefined;
+
+      try {
+        const createdDate = new Date(frontmatter.created);
+        createdAt = isNaN(createdDate.getTime()) ? new Date() : createdDate;
+      } catch {
+        createdAt = new Date();
+      }
+
+      try {
+        const updatedDate = new Date(frontmatter.updated);
+        updatedAt = isNaN(updatedDate.getTime()) ? new Date() : updatedDate;
+      } catch {
+        updatedAt = new Date();
+      }
+
+      if (frontmatter.deletedAt) {
+        try {
+          const deletedDate = new Date(frontmatter.deletedAt);
+          deletedAt = isNaN(deletedDate.getTime()) ? undefined : deletedDate;
+        } catch {
+          deletedAt = undefined;
+        }
+      }
+
+      const note: Note = {
+        id,
+        title,
+        content: typeof content === 'string' ? content.trim() : '',
+        tags,
+        createdAt,
+        updatedAt,
+        isDeleted: Boolean(frontmatter.isDeleted),
+        deletedAt,
       };
+
+      return note;
     } catch (error) {
       throw this.createError(
         FileSystemErrorCode.READ_FAILED,
@@ -121,13 +198,16 @@ export class MarkdownConverter {
   /**
    * Gera nome de arquivo baseado no título da nota
    */
-  generateFileName(title: string): string {
-    if (!title || title.trim() === '') {
+  generateFileName(title: string | undefined | null): string {
+    // Garantir que temos uma string
+    const safeTitle = typeof title === 'string' ? title : '';
+    
+    if (!safeTitle || safeTitle.trim() === '') {
       return `nota-${Date.now()}.md`;
     }
 
     // Limpar caracteres especiais e espaços
-    const cleanTitle = title
+    const cleanTitle = safeTitle
       .trim()
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais
@@ -222,11 +302,27 @@ export class MarkdownConverter {
     const [, frontmatterText, bodyContent] = match;
     const frontmatter = this.yamlToObject(frontmatterText) as NoteFrontmatter;
     
-    // Remover título H1 do conteúdo se existir e for igual ao título do frontmatter
+    // Remover título H1 do conteúdo se existir e for exatamente igual ao título do frontmatter
     let processedContent = bodyContent;
-    if (frontmatter.title) {
-      const titleRegex = new RegExp(`^# ${this.escapeRegex(frontmatter.title)}\\n\\n?`, 'i');
-      processedContent = processedContent.replace(titleRegex, '');
+    if (frontmatter.title && typeof frontmatter.title === 'string' && bodyContent) {
+      this.debugLog('Processando remoção H1', { 
+        frontmatterTitle: frontmatter.title, 
+        bodyContentStart: bodyContent.substring(0, 100) 
+      });
+      
+      // Criar regex mais específica para evitar falsas correspondências
+      const escapedTitle = this.escapeRegex(frontmatter.title);
+      const titleRegex = new RegExp(`^# ${escapedTitle}(\\n\\n?|$)`, 'm');
+      
+      // Verificar se há uma correspondência exata
+      const match = bodyContent.match(titleRegex);
+      if (match && match.index === 0) {
+        this.debugLog('H1 encontrado e removido', { match: match[0] });
+        // Apenas remover se for exatamente no início e corresponder exatamente
+        processedContent = bodyContent.replace(titleRegex, '').trim();
+      } else {
+        this.debugLog('H1 não encontrado ou não corresponde', { match, index: match?.index });
+      }
     }
 
     return {
@@ -266,6 +362,15 @@ export class MarkdownConverter {
    */
   private yamlToObject(yamlText: string): Record<string, any> {
     const obj: Record<string, any> = {};
+    
+    // Verificar se o input é válido
+    if (typeof yamlText !== 'string') {
+      console.error('yamlToObject: entrada inválida:', typeof yamlText);
+      return obj;
+    }
+
+    this.debugLog('Parsing YAML', { yamlText });
+
     const lines = yamlText.split('\n');
     let currentArray: string | null = null;
     let currentArrayItems: string[] = [];
@@ -277,7 +382,8 @@ export class MarkdownConverter {
       // Processar arrays
       if (trimmed.startsWith('- ')) {
         if (currentArray) {
-          currentArrayItems.push(this.unescapeYamlValue(trimmed.substring(2)));
+          const arrayValue = trimmed.substring(2);
+          currentArrayItems.push(this.unescapeYamlValue(arrayValue));
         }
         continue;
       }
@@ -295,6 +401,9 @@ export class MarkdownConverter {
 
       const key = trimmed.substring(0, colonIndex).trim();
       const value = trimmed.substring(colonIndex + 1).trim();
+
+      // Verificar se key é válido
+      if (!key) continue;
 
       if (value === '' || value === '[]') {
         // Início de array ou array vazio
@@ -314,6 +423,7 @@ export class MarkdownConverter {
       obj[currentArray] = currentArrayItems;
     }
 
+    this.debugLog('YAML parsing resultado', obj);
     return obj;
   }
 
@@ -322,9 +432,12 @@ export class MarkdownConverter {
    */
   private escapeYamlValue(value: any): string {
     if (typeof value === 'string') {
-      // Escapar aspas e caracteres especiais
-      if (value.includes('"') || value.includes("'") || value.includes('\n') || value.includes(':')) {
-        return `"${value.replace(/"/g, '\\"')}"`;
+      // Lista de caracteres que precisam de escape ou aspas
+      const needsQuotes = /[\n\r\t"':#@`|>{}[\]\\]|^\s|\s$|^[!&*]|^[\-?:,[\]{}#&*!|>'"%@`]|:\s|,\s|\s#/.test(value);
+      
+      if (needsQuotes || value.includes('"') || value.includes("'")) {
+        // Usar aspas duplas e escapar aspas internas
+        return `"${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
       }
       return value;
     }
@@ -335,27 +448,52 @@ export class MarkdownConverter {
    * Remove escape de valores YAML
    */
   private unescapeYamlValue(value: string): any {
-    if (value.startsWith('"') && value.endsWith('"')) {
-      return value.slice(1, -1).replace(/\\"/g, '"');
+    // Verificar se o valor é uma string válida
+    if (typeof value !== 'string') {
+      console.error('unescapeYamlValue: valor inválido:', typeof value, value);
+      return String(value || '');
     }
-    if (value.startsWith("'") && value.endsWith("'")) {
-      return value.slice(1, -1).replace(/''/g, "'");
+
+    const trimmedValue = value.trim();
+    
+    // Processar strings com aspas duplas
+    if (trimmedValue.startsWith('"') && trimmedValue.endsWith('"') && trimmedValue.length >= 2) {
+      return trimmedValue.slice(1, -1)
+        .replace(/\\"/g, '"')
+        .replace(/\\\\/g, '\\');
+    }
+    
+    // Processar strings com aspas simples
+    if (trimmedValue.startsWith("'") && trimmedValue.endsWith("'") && trimmedValue.length >= 2) {
+      return trimmedValue.slice(1, -1).replace(/''/g, "'");
     }
     
     // Tentar converter para número ou booleano
-    if (value === 'true') return true;
-    if (value === 'false') return false;
-    if (/^\d+$/.test(value)) return parseInt(value, 10);
-    if (/^\d+\.\d+$/.test(value)) return parseFloat(value);
+    if (trimmedValue === 'true') return true;
+    if (trimmedValue === 'false') return false;
+    if (trimmedValue === 'null') return null;
+    if (trimmedValue === 'undefined') return undefined;
     
-    return value;
+    // Tentar converter para número (apenas se for claramente um número)
+    if (/^-?\d+$/.test(trimmedValue)) {
+      const num = parseInt(trimmedValue, 10);
+      return isNaN(num) ? trimmedValue : num;
+    }
+    
+    if (/^-?\d+\.\d+$/.test(trimmedValue)) {
+      const num = parseFloat(trimmedValue);
+      return isNaN(num) ? trimmedValue : num;
+    }
+    
+    return trimmedValue;
   }
 
   /**
    * Escapa string para regex
    */
-  private escapeRegex(str: string): string {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  private escapeRegex(str: string | undefined | null): string {
+    const safeStr = typeof str === 'string' ? str : '';
+    return safeStr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   /**

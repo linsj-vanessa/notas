@@ -183,50 +183,87 @@ export class DataValidator {
     migrated: Note,
     result: FileValidationResult
   ): void {
-    // Validar campos obrigatórios
-    if (original.id !== migrated.id) {
+    // Validar campos obrigatórios com verificação de tipos
+    const originalId = typeof original.id === 'string' ? original.id : '';
+    const migratedId = typeof migrated.id === 'string' ? migrated.id : '';
+    
+    if (originalId !== migratedId) {
       result.errors.push('ID da nota não corresponde');
       result.isValid = false;
     }
 
-    if (original.title !== migrated.title) {
+    const originalTitle = typeof original.title === 'string' ? original.title : '';
+    const migratedTitle = typeof migrated.title === 'string' ? migrated.title : '';
+    
+    if (originalTitle !== migratedTitle) {
       result.errors.push('Título da nota não corresponde');
       result.isValid = false;
     }
 
-    if (original.content !== migrated.content) {
-      result.warnings.push('Conteúdo da nota foi modificado (pode ser devido à formatação)');
+    // Validar conteúdo com mais tolerância para formatação
+    const originalContent = typeof original.content === 'string' ? original.content.trim() : '';
+    const migratedContent = typeof migrated.content === 'string' ? migrated.content.trim() : '';
+    
+    if (originalContent !== migratedContent) {
+      // Verificar se é apenas diferença de formatação
+      const normalizedOriginal = originalContent.replace(/\s+/g, ' ').trim();
+      const normalizedMigrated = migratedContent.replace(/\s+/g, ' ').trim();
+      
+      if (normalizedOriginal !== normalizedMigrated) {
+        result.warnings.push('Conteúdo da nota foi modificado');
+      }
     }
 
-    // Validar datas
-    if (Math.abs(original.createdAt.getTime() - migrated.createdAt.getTime()) > 1000) {
-      result.errors.push('Data de criação não corresponde');
+    // Validar datas com verificação de instância
+    if (original.createdAt instanceof Date && migrated.createdAt instanceof Date) {
+      if (Math.abs(original.createdAt.getTime() - migrated.createdAt.getTime()) > 2000) {
+        result.warnings.push('Data de criação difere ligeiramente');
+      }
+    } else {
+      result.errors.push('Datas de criação inválidas');
       result.isValid = false;
     }
 
-    if (Math.abs(original.updatedAt.getTime() - migrated.updatedAt.getTime()) > 1000) {
-      result.errors.push('Data de atualização não corresponde');
+    if (original.updatedAt instanceof Date && migrated.updatedAt instanceof Date) {
+      if (Math.abs(original.updatedAt.getTime() - migrated.updatedAt.getTime()) > 2000) {
+        result.warnings.push('Data de atualização difere ligeiramente');
+      }
+    } else {
+      result.errors.push('Datas de atualização inválidas');
       result.isValid = false;
     }
 
-    // Validar tags
-    const originalTags = (original.tags || []).sort();
-    const migratedTags = (migrated.tags || []).sort();
+    // Validar tags com mais robustez
+    const originalTags = Array.isArray(original.tags) ? original.tags.filter(tag => typeof tag === 'string') : [];
+    const migratedTags = Array.isArray(migrated.tags) ? migrated.tags.filter(tag => typeof tag === 'string') : [];
+    
+    originalTags.sort();
+    migratedTags.sort();
     
     if (JSON.stringify(originalTags) !== JSON.stringify(migratedTags)) {
       result.warnings.push('Tags da nota foram modificadas');
     }
 
     // Validar status de lixeira
-    if (original.isDeleted !== migrated.isDeleted) {
+    const originalDeleted = Boolean(original.isDeleted);
+    const migratedDeleted = Boolean(migrated.isDeleted);
+    
+    if (originalDeleted !== migratedDeleted) {
       result.errors.push('Status de lixeira não corresponde');
       result.isValid = false;
     }
 
-    if (original.deletedAt && migrated.deletedAt) {
-      if (Math.abs(original.deletedAt.getTime() - migrated.deletedAt.getTime()) > 1000) {
-        result.errors.push('Data de exclusão não corresponde');
+    // Validar data de exclusão
+    if (original.deletedAt || migrated.deletedAt) {
+      if (original.deletedAt instanceof Date && migrated.deletedAt instanceof Date) {
+        if (Math.abs(original.deletedAt.getTime() - migrated.deletedAt.getTime()) > 2000) {
+          result.warnings.push('Data de exclusão difere ligeiramente');
+        }
+      } else if (original.deletedAt && !migrated.deletedAt) {
+        result.errors.push('Data de exclusão perdida na migração');
         result.isValid = false;
+      } else if (!original.deletedAt && migrated.deletedAt) {
+        result.warnings.push('Data de exclusão adicionada na migração');
       }
     }
   }

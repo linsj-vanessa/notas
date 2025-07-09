@@ -5,6 +5,7 @@ import { markdownConverter } from '@/lib/file-system/MarkdownConverter';
 import { FileSystemError, FileSystemErrorCode } from '@/lib/file-system/types';
 import { BackupManager } from './BackupManager';
 import { DataValidator } from './DataValidator';
+import { DataCleaner } from './DataCleaner';
 
 export interface MigrationProgress {
   stage: 'preparing' | 'backing-up' | 'migrating' | 'validating' | 'completed' | 'error';
@@ -52,15 +53,27 @@ export class IndexedDBMigrator {
 
     try {
       // Fase 1: Preparação
-      this.reportProgress('preparing', 0, 1, 'Carregando dados do IndexedDB...');
+      this.reportProgress('preparing', 0, 3, 'Carregando dados do IndexedDB...');
       
-      const allNotes = await this.loadNotesFromIndexedDB();
+      const rawNotes = await this.loadNotesFromIndexedDB();
+      
+      this.reportProgress('preparing', 1, 3, 'Limpando e validando dados...');
+      
+      // Limpar dados problemáticos
+      const cleaningResult = DataCleaner.cleanNotes(rawNotes);
+      if (cleaningResult.unfixableIssues.length > 0) {
+        result.errors.push(...cleaningResult.unfixableIssues);
+      }
+      
+      // Usar dados limpos
+      const allNotes = DataCleaner.removeDuplicates(DataCleaner.sortNotes(cleaningResult.cleanedNotes));
       const activeNotes = allNotes.filter(note => !note.isDeleted);
       const trashedNotes = allNotes.filter(note => note.isDeleted);
       
       const totalItems = activeNotes.length + (options.includeTrash ? trashedNotes.length : 0);
       
-      this.reportProgress('preparing', 1, 1, `Encontradas ${totalItems} notas para migrar`);
+      this.reportProgress('preparing', 2, 3, `Dados limpos: ${cleaningResult.cleanedCount}/${cleaningResult.originalCount} notas válidas`);
+      this.reportProgress('preparing', 3, 3, `Encontradas ${totalItems} notas para migrar`);
 
       // Fase 2: Backup (se solicitado)
       if (options.createBackup) {
