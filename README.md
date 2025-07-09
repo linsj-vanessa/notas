@@ -70,11 +70,62 @@ Similar aos melhores editores modernos como **Notion**, **Obsidian** e **Typora*
 - ✅ **Navegação Simples**: Alternância fácil entre notas ativas e lixeira
 - ✅ **Operações em Lote**: Opção de esvaziar lixeira completamente
 
-### 💾 **Armazenamento**
+### 📊 **Dashboard de Produtividade**
+- ✅ **Métricas Completas**: Total de palavras, dias ativos, notas criadas, streaks de escrita
+- ✅ **Meta Diária Configurável**: Defina e acompanhe sua meta de palavras por dia
+- ✅ **Heatmap Interativo**: Visualização estilo GitHub dos seus dias de escrita
+- ✅ **Gráfico de Tendências**: Evolução das suas palavras nos últimos 30 dias
+- ✅ **Sistema de Conquistas**: 16 conquistas desbloqueáveis em 4 categorias diferentes
+- ✅ **Análise de Escrita**: Insights sobre estilo, palavras mais usadas e nível de leitura
+- ✅ **Recordes Pessoais**: Melhor dia, melhor streak, estatísticas semanais/mensais
+- ✅ **Configurações Personalizáveis**: Ajuste metas e preferências do dashboard
+
+### 📤 **Exportação de Relatórios**
+- ✅ **Relatórios em PDF**: Relatórios completos formatados para impressão
+- ✅ **Exportação CSV**: Dados tabulares para análise em planilhas (Excel, Google Sheets)
+- ✅ **Exportação JSON**: Dados brutos para integração técnica
+- ✅ **Filtros por Período**: Exporte dados de períodos específicos (semana, mês, personalizado)
+- ✅ **Nomes Personalizados**: Defina nomes customizados para seus relatórios
+- ✅ **Relatórios Detalhados**: Incluem métricas, conquistas, insights e atividade recente
+
+### 🔔 **Sistema de Notificações**
+- ✅ **Lembretes Inteligentes**: Notificações para manter sua rotina de escrita
+- ✅ **Horários Personalizáveis**: Configure o melhor horário para receber lembretes
+- ✅ **Frequência Flexível**: Diária ou dias personalizados da semana
+- ✅ **Notificações de Conquistas**: Seja avisado quando desbloquear uma nova conquista
+- ✅ **Metas Atingidas**: Receba paraféns quando atingir sua meta diária
+- ✅ **Streaks Especiais**: Celebre marcos importantes (3, 7, 30, 100 dias)
+- ✅ **Controle Inteligente**: Para automaticamente quando você escreve no dia
+- ✅ **Teste de Funcionamento**: Botão para testar se as notificações estão ativas
+
+### 🛡️ **Sistema de Backup Automático**
+- ✅ **Backup Automático**: Backups programados para proteger seus dados
+- ✅ **Configuração Flexível**: Defina intervalos (diário, semanal, mensal)
+- ✅ **Backup Manual**: Crie backups manuais com nomes personalizados
+- ✅ **Restauração Completa**: Restaure suas notas a partir de arquivos de backup
+- ✅ **Gestão de Backups**: Visualize, organize e delete backups antigos
+- ✅ **Múltiplos Formatos**: Backups em JSON com metadados completos
+- ✅ **Validação de Integridade**: Verificação automática da validade dos backups
+- ✅ **Configurações Avançadas**: Controle o número máximo de backups automáticos
+
+### 🔍 **Busca Avançada**
+- ✅ **Busca Instantânea**: Resultados em tempo real conforme você digita
+- ✅ **Filtros Inteligentes**: Por data de criação, tags, tipo de conteúdo
+- ✅ **Busca por Tags**: Filtre notas específicas por tags combinadas
+- ✅ **Ordenação Múltipla**: Por relevância, data, título (crescente/decrescente)
+- ✅ **Dropdown Interativo**: Preview dos resultados com navegação por teclado
+- ✅ **Destaque de Termos**: Palavras encontradas são destacadas nos resultados
+- ✅ **Busca em Título/Conteúdo**: Escolha onde buscar (título, conteúdo ou ambos)
+- ✅ **Incluir Deletadas**: Opção de buscar também em notas da lixeira
+- ✅ **Interface Moderna**: Modal elegante com todos os filtros organizados
+
+### 💾 **Armazenamento e Segurança**
 - ✅ Armazenamento local no navegador (IndexedDB)
 - ✅ Sem necessidade de servidor
 - ✅ Dados privados e seguros
 - ✅ Sincronização automática
+- ✅ Backup automático para proteção extra
+- ✅ Validação de integridade dos dados
 
 ## 🚀 Como Usar
 
@@ -124,12 +175,71 @@ Similar aos melhores editores modernos como **Notion**, **Obsidian** e **Typora*
 - Digite título ou conteúdo para filtrar as notas
 - A busca é instantânea e exclui automaticamente notas da lixeira
 
-### 8. **Interface Centralizada e Estética**
+### 8. **Dashboard de Produtividade**
+- **Acessar Dashboard**: Clique em "Dashboard" na navegação principal (primeira opção)
+- **Visualizar Métricas**: Veja total de palavras, dias ativos, streak atual e meta diária
+- **Interagir com Heatmap**: Passe o mouse sobre os dias para ver detalhes de atividade
+- **Configurar Meta**: Clique em "⚙️ Configurações" para definir sua meta diária de palavras
+- **Ver Conquistas**: Acompanhe seu progresso com 16 conquistas desbloqueáveis
+- **Filtrar Períodos**: Use os filtros semana/mês/ano para ver dados específicos
+- **Análise de Tendências**: Observe o gráfico para acompanhar sua evolução
+
+### 9. **Exportar Relatórios**
+- **Acessar Exportação**: No dashboard, clique em "📊 Exportar"
+- **Escolher Formato**: PDF (para impressão), CSV (para planilhas) ou JSON (dados brutos)
+- **Selecionar Período**: Exporte dados de todos os tempos, última semana, mês ou período personalizado
+- **Nomear Arquivo**: Defina um nome personalizado para seu relatório
+- **Download Automático**: O arquivo será baixado automaticamente após a criação
+
+### 10. **Configurar Notificações**
+- **Ativar Lembretes**: No dashboard, clique em "🔔 Notificações"
+- **Definir Horário**: Escolha o melhor horário para receber lembretes de escrita
+- **Escolher Frequência**: Configure para todos os dias ou dias específicos da semana
+- **Testar Funcionamento**: Use o botão "Testar" para verificar se as notificações estão funcionando
+- **Personalizar Intervalo**: Defina de quanto em quanto tempo receber lembretes se não escrever
+
+### 11. **Gerenciar Backups**
+- **Acessar Backups**: No dashboard, clique em "🛡️ Backup"
+- **Backup Manual**: Use "Backup Rápido" ou "Backup Nomeado" para download imediato
+- **Configurar Automático**: Ative backups automáticos e defina a frequência (diário a mensal)
+- **Restaurar Dados**: Na aba "Restaurar", faça upload de um arquivo de backup para recuperar notas
+- **Gerenciar Backups**: Visualize, restaure ou delete backups automáticos existentes
+
+### 12. **Busca Avançada**
+- **Busca Rápida**: Digite na barra de busca para ver sugestões instantâneas
+- **Navegação por Teclado**: Use setas ↑↓ para navegar e Enter para selecionar
+- **Busca Avançada**: Clique no ícone 🔍 ao lado da barra ou em "Busca avançada..." no dropdown
+- **Filtros Detalhados**: Use filtros por data, tags, tipo de conteúdo e ordenação
+- **Resultados Destacados**: Termos buscados aparecem destacados nos resultados
+- **Buscar Deletadas**: Marque a opção para incluir notas da lixeira na busca
+
+### 13. **Interface Centralizada e Estética**
 - **Caixinha do Editor**: O editor agora aparece em uma caixa elegante e centralizada
 - **Background Discreto**: Fundo suave que destaca o conteúdo da nota
 - **Melhor Foco**: A centralização ajuda a manter o foco na escrita
 - **Design Profissional**: Interface moderna inspirada nos melhores editores
 - **Modo Foco Aprimorado**: No modo foco, a caixa fica ainda maior para máxima concentração
+
+## 🔧 Desenvolvimento e Refatoração
+
+### Plano de Refatoração Estruturado
+Este projeto possui um **plano de refatoração abrangente** para melhorar arquitetura, performance e manutenibilidade:
+
+- 📋 **Plano Completo**: [docs/REFACTOR_PLAN.md](docs/REFACTOR_PLAN.md)
+- 📊 **Resumo Executivo**: [docs/REFACTOR_SUMMARY.md](docs/REFACTOR_SUMMARY.md)
+- 🎯 **Objetivos**: Reduzir 50% o tamanho dos arquivos grandes, melhorar 30% a performance
+- ⏱️ **Cronograma**: 6 fases em 12 semanas
+- 🧪 **Meta**: 80% cobertura de testes
+
+### Estrutura Atual vs Proposta
+- **Atual**: Componentes monolíticos, store único, serviços pesados
+- **Proposta**: Arquitetura modular, stores especializados, componentes focados
+
+### Benefícios da Refatoração
+- **Manutenibilidade**: Código mais organizado e fácil de manter
+- **Performance**: Lazy loading e otimizações de re-render
+- **Escalabilidade**: Estrutura preparada para crescimento
+- **Qualidade**: Testes unitários e error boundaries
 
 ## 🛠️ Tecnologias Utilizadas
 

@@ -5,6 +5,115 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2025-01-13
+
+### 🔧 Plano de Refatoração Estruturado
+
+#### 📋 **Documentação Técnica**
+- **Plano Completo**: Análise detalhada da arquitetura atual e proposta de refatoração
+- **Cronograma**: 6 fases estruturadas em 12 semanas para modernização do código
+- **Análise de Problemas**: Identificação de componentes monolíticos e serviços pesados
+- **Solução Modular**: Proposta de arquitetura com componentes focados e stores especializados
+- **Métricas de Sucesso**: Objetivos mensuráveis (50% redução arquivos grandes, 30% melhoria performance)
+
+#### 🎯 **Objetivos de Refatoração**
+- **Manutenibilidade**: Componentes < 150 linhas, código mais organizado
+- **Performance**: Lazy loading, memoização, otimizações de re-render
+- **Escalabilidade**: Estrutura modular preparada para crescimento
+- **Qualidade**: 80% cobertura de testes, error boundaries, documentação
+
+#### 📊 **Estrutura Proposta**
+- **Componentes Modulares**: Divisão do AppLayout em Header, Sidebar, Navigation
+- **Stores Especializados**: notesStore, uiStore, settingsStore, searchStore
+- **Hooks Customizados**: useNoteOperations, useTrashOperations, useSearch
+- **Serviços Organizados**: Analytics, Export, Search, Backup especializados
+- **Tipos Centralizados**: Organização por domínio (note, ui, store, service)
+
+#### 🛠️ **Arquivos Criados**
+- `docs/REFACTOR_PLAN.md` - Plano detalhado de refatoração
+- `docs/REFACTOR_SUMMARY.md` - Resumo executivo
+- `README.md` - Seção de desenvolvimento e refatoração
+
+### 🔄 Preparação para Modernização
+- **Baseline Estabelecida**: Estado atual documentado para comparação
+- **Cronograma Definido**: 6 fases com entregas específicas
+- **Métricas Definidas**: KPIs para medir sucesso da refatoração
+- **Próximos Passos**: Phase 1 pronta para execução (refatoração AppLayout)
+
+## [3.0.0] - 2025-01-13
+
+### 🚀 Suite Completa de Produtividade (MEGA UPDATE)
+
+#### 📊 **Dashboard de Produtividade**
+- **Métricas Avançadas**: Total de palavras, dias ativos, notas criadas, streak atual/melhor
+- **Meta Diária Configurável**: Defina e acompanhe metas personalizadas de palavras
+- **Heatmap Interativo**: Visualização estilo GitHub com 5 níveis de atividade
+- **Gráfico de Tendências**: Evolução das palavras nos últimos 30 dias com SVG customizado
+- **16 Conquistas Desbloqueáveis**: Sistema gamificado em 4 categorias (produtividade, consistência, marcos, qualidade)
+- **Análise de Insights**: Palavras mais usadas, estilo de escrita, nível de leitura
+- **Filtros Temporais**: Visualização por semana, mês ou ano
+- **Navegação Prioritária**: Dashboard como primeira opção na navegação
+
+#### 📤 **Sistema de Exportação de Relatórios**
+- **Múltiplos Formatos**: PDF (formatado para impressão), CSV (planilhas), JSON (dados brutos)
+- **Filtros por Período**: Exporte dados de períodos específicos ou personalizados
+- **Relatórios Detalhados**: Incluem métricas, conquistas, insights e atividade recente
+- **Nomes Personalizados**: Defina nomes customizados para seus arquivos
+- **Modal Elegante**: Interface organizada com preview das opções de exportação
+
+#### 🔔 **Sistema de Notificações Inteligentes**
+- **Lembretes Personalizáveis**: Configure horário, frequência e dias da semana
+- **Notificações de Conquistas**: Seja avisado ao desbloquear novas conquistas
+- **Permissões Automáticas**: Solicita e gerencia permissões do navegador
+- **Controle Inteligente**: Para automaticamente quando você escreve no dia
+- **Teste de Funcionamento**: Botão para verificar se as notificações estão ativas
+- **Modal de Configuração**: Interface completa para todas as configurações
+
+#### 🛡️ **Sistema de Backup Automático**
+- **Backup Programado**: Backups automáticos configuráveis (diário, semanal, mensal)
+- **Backup Manual**: Criação instantânea com nomes personalizados
+- **Gestão Completa**: Visualize, restaure e delete backups existentes
+- **Restauração Flexível**: Opções para substituir tudo ou mesclar dados
+- **Validação de Integridade**: Verificação automática da validade dos backups
+- **Formato Estruturado**: Backups em JSON com metadados completos
+
+#### 🔍 **Busca Avançada e Inteligente**
+- **Busca Instantânea**: Resultados em tempo real com dropdown interativo
+- **Filtros Avançados**: Por data, tags, tipo de conteúdo e critérios de ordenação
+- **Navegação por Teclado**: Suporte completo a setas e Enter para seleção
+- **Destaque de Termos**: Palavras encontradas destacadas nos resultados
+- **Modal de Filtros**: Interface completa para buscas complexas
+- **Busca em Deletadas**: Opção de incluir notas da lixeira
+- **Barra Melhorada**: Nova barra de busca com sugestões e funcionalidades avançadas
+
+### 🔧 **Integração e Experiência**
+- **Persistência Avançada**: Todas as configurações salvas no localStorage
+- **Analytics em Tempo Real**: Cálculos instantâneos de métricas de produtividade
+- **Interface Cohesiva**: Todos os modais seguem o mesmo design system
+- **Performance Otimizada**: Cálculos eficientes mesmo com grandes volumes de dados
+- **Feedback Visual**: Mensagens de sucesso/erro em todas as operações
+
+### 🎯 **Gamificação Completa**
+- **Conquistas Progressivas**: De "Primeiro Passo" até "Escritor Prolífico" (10.000 palavras)
+- **Streaks de Consistência**: Marcos de 3, 7, 30 e 100 dias consecutivos
+- **Metas de Qualidade**: Conquistas por sessões longas e produtivas
+- **Sistema Visual**: Ícones, cores e descrições para cada conquista
+- **Progresso Transparente**: Visualização clara do que falta para próximas conquistas
+
+### 📈 **Analytics Avançados**
+- **Sessões de Escrita**: Detecção automática de sessões baseada em timestamps
+- **Cálculo de Streaks**: Algoritmo inteligente para dias consecutivos
+- **Dados de Heatmap**: 5 níveis de atividade com cores graduais
+- **Tendências**: Análise de crescimento semanal e mensal
+- **Insights de Texto**: Análise de vocabulário e complexidade
+
+### 🔄 **Arquitetura Robusta**
+- **Novos Serviços**: AnalyticsService, ExportService, NotificationService, BackupService
+- **Tipos TypeScript**: Interfaces completas para todas as funcionalidades
+- **Hooks Customizados**: Facilitam integração em qualquer componente
+- **Padrão Singleton**: Garantia de instância única dos serviços
+- **Error Handling**: Tratamento robusto de erros em todas as operações
+
 ## [2.0.0] - 2025-01-08
 
 ### ✨ Sistema de Lixeira Completo (MAJOR UPDATE)
