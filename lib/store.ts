@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Note, CreateNoteData, UpdateNoteData } from '@/types/note';
 import { db } from '@/lib/db';
+import { notificationService } from '@/lib/notification-service';
 
 interface NotesState {
   notes: Note[];
@@ -69,6 +70,10 @@ export const useNotesStore = create<NotesState>()(
             notes: [note, ...state.notes],
             currentNote: note,
           }));
+          
+          // Registrar atividade de escrita para notificações
+          notificationService.registerWritingActivity();
+          
           return note;
         } catch (error) {
           console.error('Error creating note:', error);
@@ -93,6 +98,10 @@ export const useNotesStore = create<NotesState>()(
               ? { ...state.currentNote, ...updatedData }
               : state.currentNote,
           }));
+          
+          // Registrar atividade de escrita para notificações
+          notificationService.registerWritingActivity();
+          
         } catch (error) {
           console.error('Error updating note:', error);
           throw error;
