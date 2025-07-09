@@ -7,10 +7,24 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [4.0.1] - 2025-01-15
 
-### 🔧 **Correção de Navegação**
+### 🔧 **Correções Críticas**
 - **fix: Redirecionamento automático ao criar nova nota**: Implementado redirecionamento para a página do editor quando uma nova nota é criada a partir do dashboard
+- **fix: Inicialização de diretórios no sistema de arquivos**: Corrigido erro "Diretórios não inicializados" que ocorria ao escolher sistema de arquivos no setup inicial
 - **Navegação melhorada**: Seleção de notas também redireciona automaticamente para o editor quando necessário
 - **UX aprimorada**: Usuário agora é direcionado diretamente para escrever após criar uma nova nota
+
+### 🚀 **Melhorias no Sistema de Arquivos**
+- **Seleção de pasta no setup**: Adicionada etapa obrigatória de seleção de pasta quando o usuário escolhe sistema de arquivos
+- **Inicialização automática**: Diretórios são automaticamente inicializados quando o tipo de armazenamento é configurado
+- **Validação de navegador**: Verificação se o navegador suporta File System Access API
+- **Tratamento de erros**: Melhor tratamento de erros durante a configuração inicial
+- **Interface aprimorada**: Modal de setup agora inclui progresso dinâmico baseado no tipo de armazenamento escolhido
+
+### 🛠️ **Correções Técnicas**
+- **AppStoreManager**: Função `setStorageType` agora é assíncrona e inicializa automaticamente o sistema de arquivos
+- **AppSetup**: Aguarda corretamente a configuração assíncrona de armazenamento
+- **SetupModal**: Nova etapa de seleção de diretório com interface intuitiva
+- **Validação**: Melhor validação de tipos TypeScript para File System Access API
 
 ## [4.0.0] - 2025-01-15
 
