@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, memo, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, memo, useMemo, useCallback, Suspense } from 'react';
 import { useNotesStore } from '@/lib/stores';
 import { analyticsService } from '@/lib/analytics';
 import { DashboardData, ProductivityMetrics } from '@/types/analytics';
@@ -8,10 +8,12 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { formatNumber } from '@/lib/text-stats';
-import ExportModal from './export-modal';
-import NotificationSettingsModal from './notification-settings-modal';
-import BackupModal from './backup-modal';
 import { PerformanceDebug } from './performance-debug';
+
+// ✅ Lazy loading dos modais pesados - carregamento sob demanda
+const ExportModal = React.lazy(() => import('./export-modal'));
+const NotificationSettingsModal = React.lazy(() => import('./notification-settings-modal'));
+const BackupModal = React.lazy(() => import('./backup-modal'));
 
 interface DashboardProps {
   className?: string;
@@ -331,27 +333,33 @@ export function Dashboard({ className = '' }: DashboardProps) {
 
       {/* Modal de Exportação */}
       {showExportModal && dashboardData && (
-        <ExportModal
-          isOpen={showExportModal}
-          onClose={() => setShowExportModal(false)}
-          dashboardData={dashboardData}
-        />
+        <Suspense fallback={<ModalLoadingFallback />}>
+          <ExportModal
+            isOpen={showExportModal}
+            onClose={() => setShowExportModal(false)}
+            dashboardData={dashboardData}
+          />
+        </Suspense>
       )}
 
       {/* Modal de Notificações */}
       {showNotifications && (
-        <NotificationSettingsModal
-          isOpen={showNotifications}
-          onClose={() => setShowNotifications(false)}
-        />
+        <Suspense fallback={<ModalLoadingFallback />}>
+          <NotificationSettingsModal
+            isOpen={showNotifications}
+            onClose={() => setShowNotifications(false)}
+          />
+        </Suspense>
       )}
 
       {/* Modal de Backup */}
       {showBackup && (
-        <BackupModal
-          isOpen={showBackup}
-          onClose={() => setShowBackup(false)}
-        />
+        <Suspense fallback={<ModalLoadingFallback />}>
+          <BackupModal
+            isOpen={showBackup}
+            onClose={() => setShowBackup(false)}
+          />
+        </Suspense>
       )}
 
       {/* Debug de Performance */}
@@ -361,6 +369,21 @@ export function Dashboard({ className = '' }: DashboardProps) {
 }
 
 // Componentes auxiliares
+
+// ✅ Fallback para loading de modais
+function ModalLoadingFallback() {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
+        <div className="flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+          <span className="ml-3 text-gray-600 dark:text-gray-400">Carregando...</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface MetricCardProps {
   title: string;
   value: string;

@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { Search, Filter, X } from 'lucide-react';
 import { Note } from '@/types/note';
 import { useNotesStore, useUIStore } from '@/lib/stores';
-import AdvancedSearchModal from './advanced-search-modal';
+
+// ✅ Lazy loading do AdvancedSearchModal - carregamento sob demanda
+const AdvancedSearchModal = React.lazy(() => import('./advanced-search-modal'));
 
 interface EnhancedSearchBarProps {
   onSearchResults?: (results: Note[]) => void;
@@ -272,11 +274,24 @@ export default function EnhancedSearchBar({
       )}
 
       {/* Modal de busca avançada */}
-      <AdvancedSearchModal
-        isOpen={isAdvancedSearchOpen}
-        onClose={() => setIsAdvancedSearchOpen(false)}
-        onResults={handleAdvancedSearchResults}
-      />
+      {isAdvancedSearchOpen && (
+        <Suspense fallback={
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6">
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <span className="ml-3 text-gray-600 dark:text-gray-400">Carregando busca avançada...</span>
+              </div>
+            </div>
+          </div>
+        }>
+          <AdvancedSearchModal
+            isOpen={isAdvancedSearchOpen}
+            onClose={() => setIsAdvancedSearchOpen(false)}
+            onResults={handleAdvancedSearchResults}
+          />
+        </Suspense>
+      )}
     </div>
   );
 } 

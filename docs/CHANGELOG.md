@@ -5,6 +5,29 @@ Todas as mudanças notáveis deste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.1.0] - 2025-01-15
+
+### 🚀 **Otimizações de Performance - Lazy Loading**
+- **feat: Lazy loading do Dashboard**: Implementado carregamento sob demanda do componente Dashboard usando React.lazy()
+- **feat: DashboardSkeleton com shimmer effects**: Criado skeleton component elegante com animações shimmer adaptadas aos temas
+- **feat: Lazy loading de modais pesados**: ExportModal, NotificationSettingsModal e BackupModal agora carregam sob demanda
+- **feat: Lazy loading do AdvancedSearchModal**: Modal de busca avançada otimizado com carregamento dinâmico
+- **feat: NotesListSkeleton**: Skeleton component para lista de notas com feedback visual aprimorado
+- **feat: Suspense boundaries**: Implementados fallbacks elegantes para todos os componentes lazy-loaded
+- **feat: Animação shimmer**: Adicionada ao Tailwind config com gradientes suaves para melhor UX
+
+### 🎯 **Melhorias na Experiência do Usuário**
+- **Navegação mais rápida**: Componentes pesados carregam apenas quando necessário
+- **Loading states visuais**: Skeletons realistas que simulam o layout final
+- **Performance otimizada**: Redução no bundle inicial da aplicação
+- **Fallbacks consistentes**: Loading states padronizados em toda aplicação
+
+### 🛠️ **Implementação Técnica**
+- **React.lazy()**: Usado para carregamento dinâmico de componentes
+- **Suspense boundaries**: Wrapping de componentes com fallbacks elegantes
+- **Shimmer animations**: Efeitos visuais para melhor percepção de performance
+- **Code splitting**: Separação automática de chunks para componentes pesados
+
 ## [4.0.1] - 2025-01-15
 
 ### 🔧 **Correções Críticas**
